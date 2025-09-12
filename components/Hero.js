@@ -19,11 +19,15 @@ export default function Hero() {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
         <div className="text-center">
           {/* Tagline with water drop icon */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="w-6 h-6 bg-blue-500 rounded-full mr-3 flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-full"></div>
-            </div>
-            <p className="text-blue-700 font-medium text-lg">
+          <div className="flex items-center justify-center mb-8 bg-gradient-to-r from-[#EDF7FF] to-[#F3FBFF] py-1 px-2 rounded-full max-w-lg mx-auto">
+            <Image 
+              src="/droplet.png" 
+              alt="Water droplet" 
+              width={64} 
+              height={64} 
+              className="mr-2"
+            />
+            <p className="text-[#000000] font-medium text-sm">
               Secure, transparent water tracking built for lasting impact
             </p>
           </div>
