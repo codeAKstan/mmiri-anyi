@@ -60,7 +60,7 @@ export default function Header() {
           
           {/* Report a Leak Button - Hidden on mobile */}
           <div className="hidden md:flex items-center -mr-32">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+            <button className="bg-[#076DD7] hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
               Report a Leak
             </button>
           </div>
