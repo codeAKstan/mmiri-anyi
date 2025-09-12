@@ -11,8 +11,8 @@ export default function Hero() {
         {/* <Image src="/dropy.png" alt="Water drop" width={24} height={24} className="absolute top-40 left-1/4" /> */}
         <Image src="/three-drops.png" alt="Water drops" width={42} height={42} className="absolute top-45 right-1/3 " />
         {/* <Image src="/dropy.png" alt="Water drop" width={16} height={16} className="absolute top-80 left-1/2" /> */}
-        <Image src="/three-drops-left.png" alt="Water drops" width={42} height={42} className="absolute bottom-40 left-1/3" />
-        <Image src="/three-drops-2.png" alt="Water drop" width={32} height={32} className="absolute bottom-40 right-1/3" />
+        <Image src="/three-drops-left.png" alt="Water drops" width={42} height={42} className="absolute bottom-100 left-1/3" />
+        <Image src="/three-drops-2.png" alt="Water drop" width={32} height={32} className="absolute bottom-100 right-1/3" />
       </div>
 
       {/* Main content */}
@@ -57,25 +57,28 @@ export default function Hero() {
           </div>
 
           {/* Admin login link */}
-          <div className="text-center">
+          <div className="text-center mb-64">
             <a href="#" className="text-gray-500 hover:text-gray-700 font-medium transition-colors">
               Steward/Admin? Login here
             </a>
             <div className="mt-4">
-              <svg className="w-6 h-6 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
+              <Image 
+                src="/arrow-down.png" 
+                alt="Arrow down" 
+                width={16} 
+                height={16} 
+                className="mx-auto"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom wave decoration */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg className="w-full h-24" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="#3B82F6" fillOpacity="0.8"></path>
-        </svg>
-      </div>
+      {/* Bottom water decoration */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-64 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/water.png)' }}
+      ></div>
     </section>
   );
 }
