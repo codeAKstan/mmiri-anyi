@@ -33,14 +33,14 @@ export default function Hero() {
           </div>
 
           {/* Main heading */}
-          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
             Empowering People of Enugu
             <br />
             <span className="text-[#000]">Protecting Every Drop of water</span>
           </h1>
 
           {/* Description */}
-          <p className="text-2xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-2xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
             A community driven smart water monitoring system for Enugu state,
             reduces waste and brings the government closer to the communities
             it serves, working together to detect, report and resolve water issues
