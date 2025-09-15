@@ -26,13 +26,13 @@ export default function Header() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-16">
           {/* Logo */}
-          <div className="flex items-center ml-0 md:-ml-32">
+          <div className="flex items-center">
             <Image
               src="/mmiri-logo.png"
               alt="MMIRI ANYI"
               width={128}
               height={128}
-              className="mr-32"
+              className="mr-8"
             />
           </div>
           
@@ -59,7 +59,7 @@ export default function Header() {
           </nav>
           
           {/* Report a Leak Button - Hidden on mobile */}
-          <div className="hidden md:flex items-center -mr-32">
+          <div className="hidden md:flex items-center">
             <button className="bg-[#076DD7] hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
               Report a Leak
             </button>
