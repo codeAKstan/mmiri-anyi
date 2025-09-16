@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Hero from "../components/Hero";
 import TabSection from "../components/TabSection";
 import FeaturesSection from "../components/FeaturesSection";
+import ImpactSection from "../components/ImpactSection";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <TabSection />
       <FeaturesSection />
+      <ImpactSection />
     </div>
   );
 }

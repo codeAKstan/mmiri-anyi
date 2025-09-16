@@ -42,7 +42,7 @@ export default function FeaturesSection() {
 
             {/* Right side - Spot and Report card */}
              <div className="lg:col-span-1 bg-blue-50 rounded-2xl p-6 text-center">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-[#076DD7] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Image
                   src="/eye.png"
                   alt="Eye icon"
