@@ -29,9 +29,9 @@ export default function CallToActionSection() {
         
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-          <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200">
+          <a href="/report" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 inline-block">
             Report a Leak
-          </button>
+          </a>
           
           <button className="bg-white bg-opacity-20 hover:bg-opacity-30 text-black border border-white border-opacity-50 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 flex items-center space-x-2">
             <span>Call Emergency Line</span>

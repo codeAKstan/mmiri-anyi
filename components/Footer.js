@@ -44,7 +44,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Report Water Issue</a></li>
+              <li><a href="/report" className="text-gray-300 hover:text-white transition-colors duration-200">Report Water Issue</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Track My Report</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Emergency Contacts</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors duration-200">Community Dashboard</a></li>

@@ -60,9 +60,9 @@ export default function Header() {
           
           {/* Report a Leak Button - Hidden on mobile */}
           <div className="hidden md:flex items-center">
-            <button className="bg-[#076DD7] hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+            <a href="/report" className="bg-[#076DD7] hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
               Report a Leak
-            </button>
+            </a>
           </div>
           
           {/* Mobile menu button */}
@@ -104,9 +104,9 @@ export default function Header() {
               <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 Contact us
               </a>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md font-medium transition-colors mt-4">
+              <a href="/report" className="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md font-medium transition-colors mt-4 text-center">
                 Report a Leak
-              </button>
+              </a>
             </div>
           </div>
         )}
