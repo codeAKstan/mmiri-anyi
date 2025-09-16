@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import TabSection from "../components/TabSection";
 import FeaturesSection from "../components/FeaturesSection";
 import ImpactSection from "../components/ImpactSection";
+import CallToActionSection from "../components/CallToActionSection";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <TabSection />
       <FeaturesSection />
       <ImpactSection />
+      <CallToActionSection />
     </div>
   );
 }
