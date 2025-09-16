@@ -5,6 +5,7 @@ import TabSection from "../components/TabSection";
 import FeaturesSection from "../components/FeaturesSection";
 import ImpactSection from "../components/ImpactSection";
 import CallToActionSection from "../components/CallToActionSection";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <FeaturesSection />
       <ImpactSection />
       <CallToActionSection />
+      <Footer />
     </div>
   );
 }
