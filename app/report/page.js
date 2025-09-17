@@ -56,7 +56,7 @@ export default function ReportLeak() {
               Thank you for reporting this water issue. Your report has been received and assigned tracking ID: <strong>WR-{Math.random().toString(36).substr(2, 8).toUpperCase()}</strong>
             </p>
             <p className="text-gray-600 mb-8">
-              Our water stewards have been notified and will respond within 24 hours. You'll receive SMS updates on the progress.
+              Our water stewards have been notified and will respond within 24 hours. You'll receive Email updates on the progress.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
@@ -104,7 +104,7 @@ export default function ReportLeak() {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Issue Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#000000] mb-2">
                 Type of Water Issue *
               </label>
               <select
@@ -112,7 +112,7 @@ export default function ReportLeak() {
                 value={formData.issueType}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select issue type</option>
                 <option value="pipe-burst">Pipe Burst</option>
@@ -138,7 +138,7 @@ export default function ReportLeak() {
                   onChange={handleInputChange}
                   required
                   placeholder="e.g., 15 Ogui Road, New Haven"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
@@ -151,7 +151,7 @@ export default function ReportLeak() {
                   value={formData.ward}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select ward</option>
                   <option value="abakpa-nike">Abakpa Nike</option>
@@ -176,7 +176,7 @@ export default function ReportLeak() {
                 value={formData.landmark}
                 onChange={handleInputChange}
                 placeholder="e.g., Near Polo Park Mall, Opposite First Bank"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -192,7 +192,7 @@ export default function ReportLeak() {
                 required
                 rows={4}
                 placeholder="Please describe what you observed, when it started, and any other relevant details..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -203,9 +203,9 @@ export default function ReportLeak() {
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { value: 'low', label: 'Low', desc: 'Minor issue, not urgent', color: 'green' },
-                  { value: 'medium', label: 'Medium', desc: 'Moderate issue, needs attention', color: 'yellow' },
-                  { value: 'high', label: 'High', desc: 'Urgent issue, immediate action needed', color: 'red' }
+                  { value: 'low', label: 'Low', desc: 'Minor issue, not urgent', color: 'green', borderClass: 'border-green-500', bgClass: 'bg-green-50', dotClass: 'bg-green-500' },
+                  { value: 'medium', label: 'Medium', desc: 'Moderate issue, needs attention', color: 'yellow', borderClass: 'border-yellow-500', bgClass: 'bg-yellow-50', dotClass: 'bg-yellow-500' },
+                  { value: 'high', label: 'High', desc: 'Urgent issue, immediate action needed', color: 'red', borderClass: 'border-red-500', bgClass: 'bg-red-50', dotClass: 'bg-red-500' }
                 ].map((severity) => (
                   <label key={severity.value} className="relative">
                     <input
@@ -218,11 +218,11 @@ export default function ReportLeak() {
                     />
                     <div className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                       formData.severity === severity.value 
-                        ? `border-${severity.color}-500 bg-${severity.color}-50` 
+                        ? `${severity.borderClass} ${severity.bgClass}` 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}>
                       <div className="flex items-center mb-2">
-                        <div className={`w-3 h-3 rounded-full bg-${severity.color}-500 mr-2`}></div>
+                        <div className={`w-3 h-3 rounded-full ${severity.dotClass} mr-2`}></div>
                         <span className="font-medium text-gray-900">{severity.label}</span>
                       </div>
                       <p className="text-sm text-gray-600">{severity.desc}</p>
@@ -248,7 +248,8 @@ export default function ReportLeak() {
                     onChange={handleInputChange}
                     required={!formData.anonymous}
                     disabled={formData.anonymous}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="e.g., John Doe"
+                    className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   />
                 </div>
                 
@@ -264,23 +265,24 @@ export default function ReportLeak() {
                     required={!formData.anonymous}
                     disabled={formData.anonymous}
                     placeholder="e.g., +234 803 123 4567"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   />
                 </div>
               </div>
               
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address (Optional)
+                  Email Address *
                 </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  required={!formData.anonymous}
                   disabled={formData.anonymous}
                   placeholder="your.email@example.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
               </div>
               

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -48,9 +49,9 @@ export default function Hero() {
 
           {/* Action buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button className="bg-[#076DD7] hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors shadow-lg">
+            <Link href="/report" className="bg-[#076DD7] hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors shadow-lg">
               Report a Leak
-            </button>
+            </Link>
             <button className="hover:bg-gray-50 text-black px-8 py-4 rounded-lg  text-lg transition-colors shadow-lg border border-blue-200">
               How it Works
             </button>
