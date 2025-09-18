@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Search,
   Bell,
@@ -21,6 +21,69 @@ import {
 
 export default function HydroGuardDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [dashboardData, setDashboardData] = useState({
+    totalReports: 0,
+    activeIssues: 0,
+    resolvedThisWeek: 0,
+    highRiskZones: 0,
+    avgResponseTime: '0h 0m',
+    reportsByStatus: {},
+    recentReports: [],
+    adminProfile: null
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch('/api/admin/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setDashboardData(data)
+      } else {
+        console.error('Failed to fetch dashboard data')
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/admin/logout', {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        // Redirect to login page after successful logout
+        window.location.href = '/admin/login'
+      } else {
+        console.error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Error during logout:', error)
+    }
+  }
+
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'in-progress':
+        return 'bg-blue-100 text-blue-800'
+      case 'resolved':
+        return 'bg-green-100 text-green-800'
+      case 'closed':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -90,15 +153,22 @@ export default function HydroGuardDashboard() {
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0">
                 <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">JK</span>
+                  <span className="text-white text-sm font-medium">
+                    {loading ? '...' : dashboardData.adminProfile?.initials || 'AD'}
+                  </span>
                 </div>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">Joshua Kens</p>
+                <p className="text-sm font-medium text-gray-700">
+                  {loading ? 'Loading...' : dashboardData.adminProfile?.name || 'Admin'}
+                </p>
                 <p className="text-xs text-gray-500">Admin</p>
               </div>
             </div>
-            <button className="flex items-center text-sm text-red-600 hover:text-red-800">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center text-sm text-red-600 hover:text-red-800"
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Log out
             </button>
@@ -176,7 +246,9 @@ export default function HydroGuardDashboard() {
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">26</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : dashboardData.activeIssues}
+                </p>
                 <p className="text-sm text-gray-500 mt-1">Open Reports</p>
               </div>
             </div>
@@ -197,7 +269,9 @@ export default function HydroGuardDashboard() {
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">42</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : dashboardData.resolvedThisWeek}
+                </p>
                 <p className="text-sm text-gray-500 mt-1">Fixed</p>
               </div>
             </div>
@@ -218,7 +292,9 @@ export default function HydroGuardDashboard() {
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">2h 45m</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : dashboardData.avgResponseTime}
+                </p>
                 <p className="text-sm text-gray-500 mt-1">Response Time</p>
               </div>
             </div>
@@ -235,11 +311,15 @@ export default function HydroGuardDashboard() {
                   </div>
                 </div>
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">4</span>
+                  <span className="text-white text-xs font-bold">
+                    {loading ? '...' : dashboardData.highRiskZones}
+                  </span>
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">4</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : dashboardData.highRiskZones}
+                </p>
                 <p className="text-sm text-gray-500 mt-1">Zones</p>
               </div>
             </div>
@@ -307,21 +387,27 @@ export default function HydroGuardDashboard() {
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-red-500 rounded-sm mr-3"></div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">6 Urgent</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {loading ? '...' : (dashboardData.reportsByStatus?.pending || 0)} Urgent
+                    </p>
                     <p className="text-xs text-gray-500">Issues</p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-yellow-500 rounded-sm mr-3"></div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Pending</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {loading ? '...' : (dashboardData.reportsByStatus?.['in-progress'] || 0)} Pending
+                    </p>
                     <p className="text-xs text-gray-500">Verifications</p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-green-500 rounded-sm mr-3"></div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Resolved</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {loading ? '...' : (dashboardData.reportsByStatus?.resolved || 0)} Resolved
+                    </p>
                     <p className="text-xs text-gray-500">Issues</p>
                   </div>
                 </div>
@@ -362,50 +448,52 @@ export default function HydroGuardDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-gray-900">WTR-2456</span>
-                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                          • InProgress
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">Water Leaks</div>
-                        <div className="text-sm text-gray-500">Assigned to Steward John</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center mr-3">
-                          <span className="text-white text-xs font-medium">JK</span>
-                        </div>
-                        <span className="text-sm text-gray-900">Joshua Kens</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jul 25, 2025</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Abakpa Junction</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">WTR-2457</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">Pipe Break</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center mr-3">
-                          <span className="text-white text-xs font-medium">UC</span>
-                        </div>
-                        <span className="text-sm text-gray-900">Uju Calistus</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jul 25, 2025</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Ogwuiyi Road</td>
-                  </tr>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                        Loading reports...
+                      </td>
+                    </tr>
+                  ) : dashboardData.recentReports.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                        No reports found
+                      </td>
+                    </tr>
+                  ) : (
+                    dashboardData.recentReports.map((report, index) => (
+                      <tr key={report.id || index} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <span className="text-sm font-medium text-gray-900">{report.id}</span>
+                            <span className={`ml-2 inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(report.status)}`}>
+                              • {report.status.charAt(0).toUpperCase() + report.status.slice(1).replace('-', ' ')}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{report.taskName}</div>
+                            <div className="text-sm text-gray-500">
+                              {report.assignedTo !== 'Unassigned' ? `Assigned to ${report.assignedTo}` : 'Unassigned'}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center mr-3">
+                              <span className="text-white text-xs font-medium">
+                                {report.assignedBy.split(' ').map(n => n[0]).join('').toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="text-sm text-gray-900">{report.assignedBy}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.date}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.location}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

@@ -4,7 +4,6 @@ const reportSchema = new mongoose.Schema({
   trackingNumber: {
     type: String,
     required: true,
-    unique: true,
     default: function() {
       return 'WL' + Date.now() + Math.random().toString(36).substring(2, 7).toUpperCase();
     }
@@ -83,7 +82,8 @@ reportSchema.pre('save', function(next) {
 });
 
 // Create indexes for better query performance
-reportSchema.index({ trackingNumber: 1 });
+// Create indexes
+reportSchema.index({ trackingNumber: 1 }, { unique: true });
 reportSchema.index({ email: 1 });
 reportSchema.index({ status: 1 });
 reportSchema.index({ createdAt: -1 });

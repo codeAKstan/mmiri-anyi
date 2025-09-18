@@ -35,12 +35,12 @@ export async function GET() {
 
     // Get statistics
     const totalReports = await Report.countDocuments();
-    const activeIssues = await Report.countDocuments({ status: { $in: ['pending', 'in_progress'] } });
+    const activeIssues = await Report.countDocuments({ status: { $in: ['pending', 'in-progress'] } });
     const resolvedThisWeek = await Report.countDocuments({ 
       status: 'resolved',
       updatedAt: { $gte: startOfWeek }
     });
-    const highRiskZones = await Report.countDocuments({ priority: 'high' });
+    const highRiskZones = await Report.countDocuments({ severity: 'high' });
 
     // Get reports by status for pie chart
     const reportsByStatus = await Report.aggregate([
@@ -52,13 +52,29 @@ export async function GET() {
       }
     ]);
 
-    // Get recent reports
+    // Get recent reports with proper formatting
     const recentReports = await Report.find()
       .sort({ createdAt: -1 })
       .limit(10)
-      .select('reportId taskName assignedTo date location status priority');
+      .select('trackingNumber issueType assignedTo createdAt location status severity name');
 
-    // Calculate average response time (mock calculation)
+    // Format recent reports for dashboard
+    const formattedReports = recentReports.map(report => ({
+      id: report.trackingNumber,
+      taskName: report.issueType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      assignedBy: report.name || 'System',
+      assignedTo: report.assignedTo || 'Unassigned',
+      date: report.createdAt.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      location: report.location,
+      status: report.status,
+      severity: report.severity
+    }));
+
+    // Calculate average response time (mock calculation for now)
     const avgResponseTime = '2h 45m'; // This would be calculated based on actual data
 
     const stats = {
@@ -71,7 +87,12 @@ export async function GET() {
         acc[item._id] = item.count;
         return acc;
       }, {}),
-      recentReports
+      recentReports: formattedReports,
+      adminProfile: {
+        name: admin.name,
+        email: admin.email,
+        initials: admin.name.split(' ').map(n => n[0]).join('').toUpperCase()
+      }
     };
 
     return NextResponse.json(stats);
