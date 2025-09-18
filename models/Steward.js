@@ -91,9 +91,7 @@ const stewardSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create indexes for better performance
-stewardSchema.index({ email: 1 }, { unique: true });
-stewardSchema.index({ employeeId: 1 }, { unique: true });
+// Create indexes for better query performance
 stewardSchema.index({ department: 1 });
 stewardSchema.index({ status: 1 });
 stewardSchema.index({ createdAt: -1 });

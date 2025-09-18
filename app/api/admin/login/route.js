@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import connectDB from '../../../../lib/mongodb';
 import Admin from '../../../../models/Admin';
 
@@ -39,13 +40,21 @@ export async function POST(request) {
     admin.lastLogin = new Date();
     await admin.save();
 
+    // Generate JWT token
+    const token = jwt.sign(
+      { adminId: admin._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     // Create response without password
     const { password: _, ...adminData } = admin.toObject();
 
-    // Create response with session cookie
+    // Create response with session cookie and token
     const response = NextResponse.json({
       message: 'Login successful',
-      admin: adminData
+      admin: adminData,
+      token: token
     });
 
     // Set HTTP-only cookie for session

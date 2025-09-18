@@ -43,7 +43,7 @@ export async function POST(request) {
         employeeId: steward.employeeId,
         type: 'steward'
       },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 

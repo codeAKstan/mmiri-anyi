@@ -61,6 +61,10 @@ function AdminLoginContent() {
       const data = await response.json();
 
       if (response.ok) {
+        // Store the admin token in localStorage
+        if (data.token) {
+          localStorage.setItem('adminToken', data.token);
+        }
         router.push('/admin/dashboard');
       } else {
         setError(data.error || 'Login failed');

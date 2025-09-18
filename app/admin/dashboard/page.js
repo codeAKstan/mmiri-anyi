@@ -112,7 +112,7 @@ export default function HydroGuardDashboard() {
               Overview
             </a>
             <a
-              href="#"
+              href="/admin/reports"
               className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
             >
               <FileText className="text-gray-400 mr-3 h-5 w-5" />
