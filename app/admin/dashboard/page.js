@@ -331,15 +331,11 @@ export default function HydroGuardDashboard() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="h-80 bg-gray-100 rounded-lg overflow-hidden relative">
                 <img
-                  src="/images/nigeria-map.jpg"
+                  src="/nigeria-map.png"
                   alt="Eastern Nigeria Map showing water system locations"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg text-lg font-bold">
-                    EASTERN NIGERIA
-                  </div>
-                </div>
+                
               </div>
             </div>
 
