@@ -11,7 +11,7 @@ const reportSchema = new mongoose.Schema({
   issueType: {
     type: String,
     required: true,
-    enum: ['pipe-burst', 'leak', 'no-water', 'contamination', 'pressure-issue', 'other']
+    enum: ['pipe-burst', 'leak', 'no-water', 'contamination', 'pressure-issue', 'low-water-pressure', 'other']
   },
   location: {
     type: String,

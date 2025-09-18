@@ -158,11 +158,11 @@ export default function ReportLeak() {
               >
                 <option value="">Select issue type</option>
                 <option value="pipe-burst">Pipe Burst</option>
-                <option value="water-leak">Water Leak</option>
-                <option value="no-water-supply">No Water Supply</option>
-                <option value="contaminated-water">Contaminated Water</option>
+                <option value="leak">Water Leak</option>
+                <option value="no-water">No Water Supply</option>
+                <option value="contamination">Contaminated Water</option>
                 <option value="low-water-pressure">Low Water Pressure</option>
-                <option value="blocked-drainage">Blocked Drainage</option>
+                <option value="pressure-issue">Pressure Issue</option>
                 <option value="other">Other</option>
               </select>
             </div>
