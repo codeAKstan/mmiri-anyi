@@ -425,11 +425,11 @@ export default function AdminReports() {
                 <select
                   value={selectedSteward}
                   onChange={(e) => setSelectedSteward(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Choose a steward...</option>
                   {stewards
-                    .filter(steward => steward.status === 'active')
+                    .filter(steward => steward.status === 'Active')
                     .map((steward) => (
                     <option key={steward._id} value={steward._id}>
                       {steward.name} (ID: {steward.employeeId}) - {steward.department}

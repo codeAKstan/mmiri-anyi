@@ -6,11 +6,11 @@ import nodemailer from 'nodemailer';
 
 // Create email transporter
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail', // You can change this to your email service
     auth: {
       user: process.env.EMAIL_USER, // Your email
-      pass: process.env.EMAIL_PASSWORD // Your email password or app password
+      pass: process.env.EMAIL_PASS // Your email password or app password
     }
   });
 };
@@ -22,7 +22,7 @@ const sendCitizenNotification = async (report, steward) => {
     
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: report.reporterContact,
+      to: report.email,
       subject: 'Your Water Quality Report Has Been Assigned - Mmiri Anyi',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -33,7 +33,7 @@ const sendCitizenNotification = async (report, steward) => {
           <div style="padding: 20px; background-color: #f9fafb;">
             <h2>Good News! Your Report Has Been Assigned</h2>
             
-            <p>Dear ${report.reporterName},</p>
+            <p>Dear ${report.name},</p>
             
             <p>We're pleased to inform you that your water quality report has been assigned to one of our qualified stewards for investigation and resolution.</p>
             
@@ -107,8 +107,8 @@ const sendStewardNotification = async (report, steward) => {
             
             <div style="background-color: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
               <h3>Reporter Information:</h3>
-              <p><strong>Name:</strong> ${report.reporterName}</p>
-              <p><strong>Contact:</strong> ${report.reporterContact}</p>
+              <p><strong>Name:</strong> ${report.name}</p>
+              <p><strong>Contact:</strong> ${report.phone}</p>
             </div>
             
             <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
@@ -145,7 +145,8 @@ async function assignReport(request, { params }) {
   try {
     await connectDB();
 
-    const reportId = params.id;
+    const awaitedParams = await params;
+    const reportId = awaitedParams.id;
     const body = await request.json();
     const { stewardId } = body;
 
@@ -208,7 +209,7 @@ async function assignReport(request, { params }) {
     }
 
     // Check if steward is active
-    if (steward.status !== 'active') {
+    if (steward.status !== 'Active') {
       return new Response(
         JSON.stringify({
           success: false,
