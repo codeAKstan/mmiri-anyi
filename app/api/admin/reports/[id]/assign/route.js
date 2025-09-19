@@ -19,7 +19,7 @@ const createTransporter = () => {
 const sendCitizenNotification = async (report, steward) => {
   try {
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: report.email,
@@ -42,7 +42,7 @@ const sendCitizenNotification = async (report, steward) => {
               <p><strong>Issue Type:</strong> ${report.issueType}</p>
               <p><strong>Location:</strong> ${report.location}</p>
               <p><strong>Status:</strong> <span style="color: #2563eb; font-weight: bold;">In Progress</span></p>
-              <p><strong>Submitted:</strong> ${new Date(report.submissionDate).toLocaleDateString()}</p>
+              <p><strong>Submitted:</strong> ${new Date(report.createdAt).toLocaleDateString()}</p>
             </div>
             
             <div style="background-color: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -78,7 +78,7 @@ const sendCitizenNotification = async (report, steward) => {
 const sendStewardNotification = async (report, steward) => {
   try {
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: steward.email,
@@ -100,9 +100,10 @@ const sendStewardNotification = async (report, steward) => {
               <h3>Report Details:</h3>
               <p><strong>Issue Type:</strong> ${report.issueType}</p>
               <p><strong>Location:</strong> ${report.location}</p>
-              <p><strong>Priority:</strong> <span style="color: ${report.priority === 'high' ? '#dc2626' : report.priority === 'medium' ? '#d97706' : '#059669'}; font-weight: bold; text-transform: capitalize;">${report.priority}</span></p>
+              <p><strong>Priority:</strong> <span style="color: ${report.severity === 'high' ? '#dc2626' : report.severity === 'medium' ? '#d97706' : '#059669'}; font-weight: bold; text-transform: capitalize;">${report.severity}</span></p>
               <p><strong>Description:</strong> ${report.description}</p>
-              <p><strong>Submitted:</strong> ${new Date(report.submissionDate).toLocaleDateString()}</p>
+              <p><strong>Submitted:</strong> ${new Date(report.createdAt).toLocaleDateString()}</p>
+
             </div>
             
             <div style="background-color: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -157,7 +158,7 @@ async function assignReport(request, { params }) {
           success: false,
           message: 'Steward ID is required'
         }),
-        { 
+        {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         }
@@ -172,7 +173,7 @@ async function assignReport(request, { params }) {
           success: false,
           message: 'Report not found'
         }),
-        { 
+        {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         }
@@ -186,7 +187,7 @@ async function assignReport(request, { params }) {
           success: false,
           message: 'Report is not in pending status and cannot be assigned'
         }),
-        { 
+        {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         }
@@ -201,7 +202,7 @@ async function assignReport(request, { params }) {
           success: false,
           message: 'Steward not found'
         }),
-        { 
+        {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         }
@@ -215,7 +216,7 @@ async function assignReport(request, { params }) {
           success: false,
           message: 'Steward is not active and cannot be assigned reports'
         }),
-        { 
+        {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
         }
@@ -253,7 +254,7 @@ async function assignReport(request, { params }) {
           department: steward.department
         }
       }),
-      { 
+      {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       }
@@ -266,7 +267,7 @@ async function assignReport(request, { params }) {
         success: false,
         message: 'Failed to assign report'
       }),
-      { 
+      {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       }
