@@ -146,22 +146,31 @@ export async function GET(request) {
 
 // POST - Create new steward
 export async function POST(request) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const environment = isProduction ? 'PRODUCTION' : 'DEVELOPMENT';
+  
+  console.log(`[${environment}] Starting steward creation process...`);
+  console.log(`[${environment}] Environment details:`, {
+    nodeEnv: process.env.NODE_ENV,
+    host: request.headers.get('host'),
+    userAgent: request.headers.get('user-agent')?.substring(0, 50),
+    timestamp: new Date().toISOString()
+  });
+  
   try {
-    console.log('Starting steward creation process...');
-    
     const admin = await verifyAdminToken(request);
     if (!admin) {
-      console.log('Unauthorized access attempt');
+      console.log(`[${environment}] Unauthorized access attempt`);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('Admin verified:', admin.email);
+    console.log(`[${environment}] Admin verified:`, admin.email);
 
     try {
       await connectDB();
-      console.log('Database connected successfully');
+      console.log(`[${environment}] Database connected successfully`);
     } catch (dbError) {
-      console.error('Database connection failed:', dbError);
+      console.error(`[${environment}] Database connection failed:`, dbError);
       return NextResponse.json({ 
         error: 'Database connection failed', 
         details: process.env.NODE_ENV === 'development' ? dbError.message : 'Internal server error'
@@ -171,153 +180,268 @@ export async function POST(request) {
     const body = await request.json();
     const { name, email, phone, address, employeeId, department, position, dateHired } = body;
 
-    console.log('Request body received:', { name, email, phone, department, position });
+    console.log(`[${environment}] Raw request body:`, JSON.stringify(body, null, 2));
+    console.log(`[${environment}] Request body types:`, {
+      name: typeof body.name,
+      email: typeof body.email,
+      phone: typeof body.phone,
+      address: typeof body.address,
+      department: typeof body.department,
+      position: typeof body.position,
+      dateHired: typeof body.dateHired
+    });
+    console.log(`[${environment}] Extracted values:`, { 
+      name, 
+      email, 
+      phone, 
+      address, 
+      department, 
+      position, 
+      dateHired,
+      employeeId 
+    });
 
-    // Validate required fields
-    if (!name || !email || !phone || !address || !department || !position) {
-      console.log('Validation failed: Missing required fields');
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+    // Detailed validation with environment-specific logging
+    console.log(`[${environment}] Starting validation process...`);
+    
+    const missingFields = [];
+    const fieldLengthErrors = [];
+    const validationDetails = {};
+    
+    // Check required fields (trimmed to handle whitespace)
+    const fields = { name, email, phone, address, department, position };
+    
+    Object.entries(fields).forEach(([fieldName, value]) => {
+      const trimmedValue = value ? value.toString().trim() : '';
+      validationDetails[fieldName] = {
+        original: value,
+        trimmed: trimmedValue,
+        length: trimmedValue.length,
+        isEmpty: trimmedValue.length === 0
+      };
+      
+      if (!value || trimmedValue.length === 0) {
+        missingFields.push(fieldName);
+      }
+    });
+    
+    console.log(`[${environment}] Field validation details:`, validationDetails);
+    
+    // Check field lengths (according to model schema)
+    const lengthLimits = {
+      name: 100,
+      email: 100, 
+      phone: 20,
+      address: 200,
+      position: 100
+    };
+    
+    Object.entries(lengthLimits).forEach(([fieldName, limit]) => {
+      const value = fields[fieldName];
+      if (value && value.toString().trim().length > limit) {
+        fieldLengthErrors.push(`${fieldName} (max ${limit} characters, got ${value.toString().trim().length})`);
+      }
+    });
+    
+    if (missingFields.length > 0) {
+      console.log(`[${environment}] Missing required fields:`, missingFields);
+      console.log(`[${environment}] Validation failed - returning 400`);
+      return NextResponse.json({ 
+        error: `Missing required fields: ${missingFields.join(', ')}`,
+        details: validationDetails
+      }, { status: 400 });
+    }
+    
+    if (fieldLengthErrors.length > 0) {
+      console.log(`[${environment}] Field length validation errors:`, fieldLengthErrors);
+      return NextResponse.json({ 
+        error: `Field length errors: ${fieldLengthErrors.join(', ')}` 
+      }, { status: 400 });
     }
 
     // Validate email format
-    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(email)) {
-      console.log('Validation failed: Invalid email format');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const trimmedEmail = email.trim();
+    if (!emailRegex.test(trimmedEmail)) {
+      console.log(`[${environment}] Invalid email format:`, { original: email, trimmed: trimmedEmail });
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    try {
-      // Check if steward already exists
-      const existingSteward = await Steward.findOne({ email });
-      if (existingSteward) {
-        console.log('Steward already exists with email:', email);
-        return NextResponse.json({ error: 'Steward with this email already exists' }, { status: 400 });
+    // Validate department
+     const validDepartments = ['Water Quality', 'Distribution', 'Customer Service', 'Maintenance', 'Field Operations'];
+     const trimmedDepartment = department.trim();
+     if (!validDepartments.includes(trimmedDepartment)) {
+       console.log(`[${environment}] Invalid department:`, { 
+         original: department, 
+         trimmed: trimmedDepartment,
+         validOptions: validDepartments 
+       });
+       return NextResponse.json({ 
+         error: `Invalid department. Must be one of: ${validDepartments.join(', ')}` 
+       }, { status: 400 });
+     }
+
+     // Validate phone (match model regex exactly)
+      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+      const trimmedPhone = phone.trim();
+      if (!phoneRegex.test(trimmedPhone)) {
+        console.log(`[${environment}] Invalid phone format:`, { 
+          original: phone, 
+          trimmed: trimmedPhone,
+          regex: phoneRegex.toString(),
+          modelRegex: '/^[\\+]?[1-9][\\d]{0,15}$/'
+        });
+        return NextResponse.json({ error: 'Invalid phone number format. Must start with 1-9 and contain only digits (optionally with + prefix)' }, { status: 400 });
       }
+     
+     console.log(`[${environment}] All validation checks passed!`);
+     try {
+       // Check if steward already exists
+       console.log(`[${environment}] Checking for existing steward with email:`, email);
+       const existingSteward = await Steward.findOne({ email });
+       if (existingSteward) {
+         console.log(`[${environment}] Steward already exists with email:`, email);
+         return NextResponse.json({ error: 'Steward with this email already exists' }, { status: 400 });
+       }
 
-      // Check if employeeId already exists (if provided)
-      if (employeeId) {
-        const existingEmployeeId = await Steward.findOne({ employeeId });
-        if (existingEmployeeId) {
-          console.log('Employee ID already exists:', employeeId);
-          return NextResponse.json({ error: 'Employee ID already exists' }, { status: 400 });
-        }
-      }
+       // Check if employee ID already exists (if provided)
+       if (employeeId) {
+         console.log(`[${environment}] Checking for existing employee ID:`, employeeId);
+         const existingEmployee = await Steward.findOne({ employeeId });
+         if (existingEmployee) {
+           console.log(`[${environment}] Employee ID already exists:`, employeeId);
+           return NextResponse.json({ error: 'Employee ID already exists' }, { status: 400 });
+         }
+       }
+       
+     console.log(`[${environment}] No existing conflicts found, proceeding with creation...`);
+   } catch (dbCheckError) {
+     console.error(`[${environment}] Database check error:`, dbCheckError);
+     return NextResponse.json({ 
+       error: 'Database error during validation', 
+       details: isProduction ? 'Internal server error' : dbCheckError.message 
+     }, { status: 500 });
+   }
 
-      console.log('Validation passed, generating password...');
+   console.log(`[${environment}] Validation passed, generating password...`);
 
-      // Generate password and hash it
-      const tempPassword = generatePassword();
-      const hashedPassword = await bcrypt.hash(tempPassword, 12);
+   // Generate password and hash it
+   const tempPassword = generatePassword();
+   const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
-      console.log('Password generated and hashed');
+   console.log(`[${environment}] Password generated and hashed`);
 
-      // Generate unique employeeId if not provided (fix race condition)
-      let finalEmployeeId = employeeId;
-      if (!finalEmployeeId) {
-        let attempts = 0;
-        const maxAttempts = 5;
-        
-        while (attempts < maxAttempts) {
-          try {
-            const count = await Steward.countDocuments();
-            const candidateId = `STW${String(count + 1 + attempts).padStart(4, '0')}`;
-            
-            // Check if this ID already exists
-            const existingId = await Steward.findOne({ employeeId: candidateId });
-            if (!existingId) {
-              finalEmployeeId = candidateId;
-              break;
-            }
-            attempts++;
-          } catch (countError) {
-            console.error('Error generating employee ID:', countError);
-            attempts++;
-          }
-        }
-        
-        if (!finalEmployeeId) {
-          // Fallback to timestamp-based ID
-          finalEmployeeId = `STW${Date.now().toString().slice(-4)}`;
-        }
-      }
+   // Generate unique employeeId if not provided (fix race condition)
+   let finalEmployeeId = employeeId;
+   if (!finalEmployeeId) {
+     let attempts = 0;
+     const maxAttempts = 5;
+     
+     while (attempts < maxAttempts) {
+       try {
+         const count = await Steward.countDocuments();
+         const candidateId = `STW${String(count + 1 + attempts).padStart(4, '0')}`;
+         
+         // Check if this ID already exists
+         const existingId = await Steward.findOne({ employeeId: candidateId });
+         if (!existingId) {
+           finalEmployeeId = candidateId;
+           break;
+         }
+         attempts++;
+       } catch (countError) {
+         console.error(`[${environment}] Error generating employee ID:`, countError);
+         attempts++;
+       }
+     }
+     
+     if (!finalEmployeeId) {
+       // Fallback to timestamp-based ID
+       finalEmployeeId = `STW${Date.now().toString().slice(-4)}`;
+     }
+   }
 
-      console.log('Final employee ID:', finalEmployeeId);
+   console.log(`[${environment}] Final employee ID:`, finalEmployeeId);
 
-      // Create steward
-      const steward = new Steward({
-        name,
-        email,
-        phone,
-        address,
-        employeeId: finalEmployeeId,
-        department,
-        position,
-        dateHired: dateHired || new Date(),
-        password: hashedPassword,
-        createdBy: admin._id
-      });
+   try {
+     // Create steward
+     const steward = new Steward({
+       name,
+       email,
+       phone,
+       address,
+       employeeId: finalEmployeeId,
+       department,
+       position,
+       dateHired: dateHired || new Date(),
+       password: hashedPassword,
+       createdBy: admin._id
+     });
 
-      console.log('Attempting to save steward...');
-      await steward.save();
-      console.log('Steward saved successfully with ID:', steward._id);
+     console.log(`[${environment}] Attempting to save steward...`);
+     await steward.save();
+     console.log(`[${environment}] Steward saved successfully with ID:`, steward._id);
 
-      // Send email with credentials (don't fail the whole operation if email fails)
-      let emailResult = { success: false, error: null };
-      try {
-        console.log('Attempting to send email...');
-        emailResult = await sendStewardCredentials(steward, tempPassword);
-        console.log('Email result:', emailResult);
-      } catch (emailError) {
-        console.error('Email sending failed:', emailError);
-        emailResult = { success: false, error: emailError.message };
-      }
-      
-      // Return steward data without password
-      const stewardData = await Steward.findById(steward._id)
-        .select('-password')
-        .populate('createdBy', 'name email');
+     // Send email with credentials (don't fail the whole operation if email fails)
+     let emailResult = { success: false, error: null };
+     try {
+       console.log(`[${environment}] Attempting to send email...`);
+       emailResult = await sendStewardCredentials(steward, tempPassword);
+       console.log(`[${environment}] Email result:`, emailResult);
+     } catch (emailError) {
+       console.error(`[${environment}] Email sending failed:`, emailError);
+       emailResult = { success: false, error: emailError.message };
+     }
+     
+     // Return steward data without password
+     const stewardData = await Steward.findById(steward._id)
+       .select('-password')
+       .populate('createdBy', 'name email');
 
-      console.log('Steward creation completed successfully');
+     console.log(`[${environment}] Steward creation completed successfully`);
 
-      return NextResponse.json({
-        message: 'Steward created successfully',
-        steward: stewardData,
-        emailSent: emailResult.success,
-        emailError: emailResult.error || null
-      }, { status: 201 });
+     return NextResponse.json({
+       message: 'Steward created successfully',
+       steward: stewardData,
+       emailSent: emailResult.success,
+       emailError: emailResult.error || null
+     }, { status: 201 });
 
-    } catch (dbOperationError) {
-      console.error('Database operation error:', dbOperationError);
-      
-      // Handle specific MongoDB errors
-      if (dbOperationError.code === 11000) {
-        const field = Object.keys(dbOperationError.keyPattern)[0];
-        return NextResponse.json({ 
-          error: `${field} already exists`,
-          details: `A steward with this ${field} already exists in the system`
-        }, { status: 400 });
-      }
-      
-      if (dbOperationError.name === 'ValidationError') {
-        const validationErrors = Object.values(dbOperationError.errors).map(err => err.message);
-        return NextResponse.json({ 
-          error: 'Validation failed',
-          details: validationErrors
-        }, { status: 400 });
-      }
-      
-      throw dbOperationError; // Re-throw for general error handler
-    }
+   } catch (dbOperationError) {
+     console.error(`[${environment}] Database operation error:`, dbOperationError);
+     
+     // Handle specific MongoDB errors
+     if (dbOperationError.code === 11000) {
+       const field = Object.keys(dbOperationError.keyPattern)[0];
+       return NextResponse.json({ 
+         error: `${field} already exists`,
+         details: `A steward with this ${field} already exists in the system`
+       }, { status: 400 });
+     }
+     
+     if (dbOperationError.name === 'ValidationError') {
+       const validationErrors = Object.values(dbOperationError.errors).map(err => err.message);
+       return NextResponse.json({ 
+         error: 'Validation failed',
+         details: validationErrors
+       }, { status: 400 });
+     }
+     
+     return NextResponse.json({ 
+       error: 'Database operation failed',
+       details: isProduction ? 'Internal server error' : dbOperationError.message
+     }, { status: 500 });
+   }
 
-  } catch (error) {
-    console.error('Error creating steward:', error);
-    console.error('Error stack:', error.stack);
-    
-    return NextResponse.json({ 
-      error: 'Failed to create steward',
-      details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-    }, { status: 500 });
-  }
+ } catch (error) {
+   console.error(`[${environment}] Error creating steward:`, error);
+   console.error(`[${environment}] Error stack:`, error.stack);
+   
+   return NextResponse.json({ 
+     error: 'Failed to create steward',
+     details: isProduction ? 'Internal server error' : error.message
+   }, { status: 500 });
+ }
 }
 
 // PUT - Update steward
