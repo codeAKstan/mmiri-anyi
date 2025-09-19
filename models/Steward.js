@@ -96,12 +96,10 @@ stewardSchema.index({ department: 1 });
 stewardSchema.index({ status: 1 });
 stewardSchema.index({ createdAt: -1 });
 
-// Pre-save middleware to generate employee ID if not provided
+// Pre-save middleware to generate employee ID if not provided (removed to prevent race conditions)
 stewardSchema.pre('save', async function(next) {
-  if (!this.employeeId) {
-    const count = await mongoose.model('Steward').countDocuments();
-    this.employeeId = `STW${String(count + 1).padStart(4, '0')}`;
-  }
+  // Employee ID generation is now handled in the API route to prevent race conditions
+  // This middleware is kept for any future pre-save operations
   next();
 });
 

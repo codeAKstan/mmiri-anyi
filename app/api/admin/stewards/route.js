@@ -27,6 +27,12 @@ function generatePassword(length = 12) {
 
 // Helper function to send email
 async function sendStewardCredentials(stewardData, password) {
+  // Check if email configuration is available
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log('Email configuration missing, skipping email send');
+    return { success: false, error: 'Email configuration not available' };
+  }
+
   const mailOptions = {
     from: process.env.EMAIL_USER || 'noreply@mmiri-anyi.com',
     to: stewardData.email,
@@ -61,6 +67,7 @@ async function sendStewardCredentials(stewardData, password) {
 
   try {
     await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully to:', stewardData.email);
     return { success: true };
   } catch (error) {
     console.error('Email sending failed:', error);
@@ -140,73 +147,176 @@ export async function GET(request) {
 // POST - Create new steward
 export async function POST(request) {
   try {
+    console.log('Starting steward creation process...');
+    
     const admin = await verifyAdminToken(request);
     if (!admin) {
+      console.log('Unauthorized access attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await connectDB();
+    console.log('Admin verified:', admin.email);
+
+    try {
+      await connectDB();
+      console.log('Database connected successfully');
+    } catch (dbError) {
+      console.error('Database connection failed:', dbError);
+      return NextResponse.json({ 
+        error: 'Database connection failed', 
+        details: process.env.NODE_ENV === 'development' ? dbError.message : 'Internal server error'
+      }, { status: 500 });
+    }
     
     const body = await request.json();
     const { name, email, phone, address, employeeId, department, position, dateHired } = body;
 
+    console.log('Request body received:', { name, email, phone, department, position });
+
     // Validate required fields
     if (!name || !email || !phone || !address || !department || !position) {
+      console.log('Validation failed: Missing required fields');
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-    // Check if steward already exists
-    const existingSteward = await Steward.findOne({ email });
-    if (existingSteward) {
-      return NextResponse.json({ error: 'Steward with this email already exists' }, { status: 400 });
+    // Validate email format
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email)) {
+      console.log('Validation failed: Invalid email format');
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    // Check if employeeId already exists (if provided)
-    if (employeeId) {
-      const existingEmployeeId = await Steward.findOne({ employeeId });
-      if (existingEmployeeId) {
-        return NextResponse.json({ error: 'Employee ID already exists' }, { status: 400 });
+    try {
+      // Check if steward already exists
+      const existingSteward = await Steward.findOne({ email });
+      if (existingSteward) {
+        console.log('Steward already exists with email:', email);
+        return NextResponse.json({ error: 'Steward with this email already exists' }, { status: 400 });
       }
+
+      // Check if employeeId already exists (if provided)
+      if (employeeId) {
+        const existingEmployeeId = await Steward.findOne({ employeeId });
+        if (existingEmployeeId) {
+          console.log('Employee ID already exists:', employeeId);
+          return NextResponse.json({ error: 'Employee ID already exists' }, { status: 400 });
+        }
+      }
+
+      console.log('Validation passed, generating password...');
+
+      // Generate password and hash it
+      const tempPassword = generatePassword();
+      const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+      console.log('Password generated and hashed');
+
+      // Generate unique employeeId if not provided (fix race condition)
+      let finalEmployeeId = employeeId;
+      if (!finalEmployeeId) {
+        let attempts = 0;
+        const maxAttempts = 5;
+        
+        while (attempts < maxAttempts) {
+          try {
+            const count = await Steward.countDocuments();
+            const candidateId = `STW${String(count + 1 + attempts).padStart(4, '0')}`;
+            
+            // Check if this ID already exists
+            const existingId = await Steward.findOne({ employeeId: candidateId });
+            if (!existingId) {
+              finalEmployeeId = candidateId;
+              break;
+            }
+            attempts++;
+          } catch (countError) {
+            console.error('Error generating employee ID:', countError);
+            attempts++;
+          }
+        }
+        
+        if (!finalEmployeeId) {
+          // Fallback to timestamp-based ID
+          finalEmployeeId = `STW${Date.now().toString().slice(-4)}`;
+        }
+      }
+
+      console.log('Final employee ID:', finalEmployeeId);
+
+      // Create steward
+      const steward = new Steward({
+        name,
+        email,
+        phone,
+        address,
+        employeeId: finalEmployeeId,
+        department,
+        position,
+        dateHired: dateHired || new Date(),
+        password: hashedPassword,
+        createdBy: admin._id
+      });
+
+      console.log('Attempting to save steward...');
+      await steward.save();
+      console.log('Steward saved successfully with ID:', steward._id);
+
+      // Send email with credentials (don't fail the whole operation if email fails)
+      let emailResult = { success: false, error: null };
+      try {
+        console.log('Attempting to send email...');
+        emailResult = await sendStewardCredentials(steward, tempPassword);
+        console.log('Email result:', emailResult);
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        emailResult = { success: false, error: emailError.message };
+      }
+      
+      // Return steward data without password
+      const stewardData = await Steward.findById(steward._id)
+        .select('-password')
+        .populate('createdBy', 'name email');
+
+      console.log('Steward creation completed successfully');
+
+      return NextResponse.json({
+        message: 'Steward created successfully',
+        steward: stewardData,
+        emailSent: emailResult.success,
+        emailError: emailResult.error || null
+      }, { status: 201 });
+
+    } catch (dbOperationError) {
+      console.error('Database operation error:', dbOperationError);
+      
+      // Handle specific MongoDB errors
+      if (dbOperationError.code === 11000) {
+        const field = Object.keys(dbOperationError.keyPattern)[0];
+        return NextResponse.json({ 
+          error: `${field} already exists`,
+          details: `A steward with this ${field} already exists in the system`
+        }, { status: 400 });
+      }
+      
+      if (dbOperationError.name === 'ValidationError') {
+        const validationErrors = Object.values(dbOperationError.errors).map(err => err.message);
+        return NextResponse.json({ 
+          error: 'Validation failed',
+          details: validationErrors
+        }, { status: 400 });
+      }
+      
+      throw dbOperationError; // Re-throw for general error handler
     }
-
-    // Generate password and hash it
-    const tempPassword = generatePassword();
-    const hashedPassword = await bcrypt.hash(tempPassword, 12);
-
-    // Create steward
-    const steward = new Steward({
-      name,
-      email,
-      phone,
-      address,
-      employeeId, // Include employeeId (will be auto-generated if not provided)
-      department,
-      position,
-      dateHired: dateHired || new Date(),
-      password: hashedPassword,
-      createdBy: admin._id
-    });
-
-    await steward.save();
-
-    // Send email with credentials
-    const emailResult = await sendStewardCredentials(steward, tempPassword);
-    
-    // Return steward data without password
-    const stewardData = await Steward.findById(steward._id)
-      .select('-password')
-      .populate('createdBy', 'name email');
-
-    return NextResponse.json({
-      message: 'Steward created successfully',
-      steward: stewardData,
-      emailSent: emailResult.success,
-      emailError: emailResult.error || null
-    }, { status: 201 });
 
   } catch (error) {
     console.error('Error creating steward:', error);
-    return NextResponse.json({ error: 'Failed to create steward' }, { status: 500 });
+    console.error('Error stack:', error.stack);
+    
+    return NextResponse.json({ 
+      error: 'Failed to create steward',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    }, { status: 500 });
   }
 }
 
