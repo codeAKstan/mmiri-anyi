@@ -50,7 +50,7 @@ async function sendStewardCredentials(stewardData, password) {
           <p style="margin: 0;"><strong>Important:</strong> Please change your password after your first login for security purposes.</p>
         </div>
         
-        <p>You can access the system at: <a href="http://localhost:3000/steward/login">Steward Portal</a></p>
+        <p>You can access the system at: <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://mmirianyi.vercel.app'}/steward/login">Steward Portal</a></p>
         
         <p>If you have any questions, please contact your administrator.</p>
         
