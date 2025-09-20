@@ -232,73 +232,73 @@ export default function HydroGuardDashboard() {
           </div>
 
           {/* Stats cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Active Issues */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Active Issues</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-500">Active Issues</p>
                   </div>
                 </div>
-                <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-xs font-bold">!</span>
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">
                   {loading ? '...' : dashboardData.activeIssues}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">Open Reports</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">Open Reports</p>
               </div>
             </div>
 
             {/* Resolved This Week */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Resolved This Week</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-500">Resolved This Week</p>
                   </div>
                 </div>
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">
                   {loading ? '...' : dashboardData.resolvedThisWeek}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">Fixed</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">Fixed</p>
               </div>
             </div>
 
             {/* Avg Response Time */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-yellow-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Avg Response Time</p>
+                  <div className="ml-3 sm:ml-4">
+                    <p className="text-xs sm:text-sm font-medium text-gray-500">Avg Response Time</p>
                   </div>
                 </div>
-                <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">
                   {loading ? '...' : dashboardData.avgResponseTime}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">Response Time</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">Response Time</p>
               </div>
             </div>
 
@@ -328,104 +328,118 @@ export default function HydroGuardDashboard() {
             </div>
           </div>
 
+          {/* High Risk Zones */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">High Risk Zones</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {loading ? (
+                <div className="col-span-full text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="text-gray-500 mt-2 text-sm">Loading zones...</p>
+                </div>
+              ) : (
+                dashboardData.highRiskZones?.map((zone, index) => (
+                  <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-gray-900 text-sm sm:text-base">{zone.name}</h4>
+                      <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                        {zone.riskLevel}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2">{zone.description}</p>
+                    <div className="flex items-center text-xs sm:text-sm text-red-600">
+                      <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      {zone.issueCount} active issues
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
           {/* Map and Chart Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Map */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="h-80 bg-gray-100 rounded-lg overflow-hidden relative">
-                <img
-                  src="/nigeria-map.png"
-                  alt="Eastern Nigeria Map showing water system locations"
-                  className="w-full h-full object-cover"
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Zone Map</h3>
+              <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                <img 
+                  src="/api/placeholder/400/300" 
+                  alt="Zone Map" 
+                  className="w-full h-full object-cover rounded-lg"
                 />
-                
               </div>
             </div>
 
             {/* Chart */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-blue-600 mb-6">Map Overview</h3>
-              <div className="flex items-center justify-center mb-6">
-                <div className="relative w-40 h-40">
-                  {/* Donut Chart */}
-                  <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="35"
-                      stroke="#ef4444"
-                      strokeWidth="12"
-                      fill="transparent"
-                      strokeDasharray="65.97 131.95"
-                      strokeDashoffset="0"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="35"
-                      stroke="#f59e0b"
-                      strokeWidth="12"
-                      fill="transparent"
-                      strokeDasharray="43.98 131.95"
-                      strokeDashoffset="-65.97"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="35"
-                      stroke="#10b981"
-                      strokeWidth="12"
-                      fill="transparent"
-                      strokeDasharray="87.96 131.95"
-                      strokeDashoffset="-109.95"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-red-500 rounded-sm mr-3"></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {loading ? '...' : (dashboardData.reportsByStatus?.pending || 0)} Urgent
-                    </p>
-                    <p className="text-xs text-gray-500">Issues</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Issue Distribution</h3>
+              <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-blue-100 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                    <span className="text-lg sm:text-xl font-bold text-blue-600">Chart</span>
                   </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-yellow-500 rounded-sm mr-3"></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {loading ? '...' : (dashboardData.reportsByStatus?.['in-progress'] || 0)} Pending
-                    </p>
-                    <p className="text-xs text-gray-500">Verifications</p>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-green-500 rounded-sm mr-3"></div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {loading ? '...' : (dashboardData.reportsByStatus?.resolved || 0)} Resolved
-                    </p>
-                    <p className="text-xs text-gray-500">Issues</p>
-                  </div>
+                  <p className="text-xs sm:text-sm text-gray-500">Donut Chart Placeholder</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Reports Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Reports</h3>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">Today</span>
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Recent Reports</h3>
+            
+            {/* Mobile Card View */}
+            <div className="sm:hidden space-y-3">
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="text-gray-500 mt-2 text-sm">Loading reports...</p>
+                </div>
+              ) : dashboardData.recentReports?.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 text-sm">No reports found</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {dashboardData.recentReports?.map((report, index) => (
+                    <div key={report.id || index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium text-gray-900">{report.id}</span>
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(report.status)}`}>
+                              • {report.status.charAt(0).toUpperCase() + report.status.slice(1).replace('-', ' ')}
+                            </span>
+                          </div>
+                          <h4 className="text-base font-medium text-gray-900 mt-1">{report.taskName}</h4>
+                          <p className="text-sm text-gray-500">
+                            {report.assignedTo !== 'Unassigned' ? `Assigned to ${report.assignedTo}` : 'Unassigned'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center">
+                          <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center mr-2">
+                            <span className="text-white text-xs font-medium">
+                              {report.assignedBy.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </span>
+                          </div>
+                          <span>{report.assignedBy}</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-500 mt-2">
+                        <span>{report.date}</span>
+                        <span>{report.location}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="overflow-x-auto">
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -453,14 +467,14 @@ export default function HydroGuardDashboard() {
                         Loading reports...
                       </td>
                     </tr>
-                  ) : dashboardData.recentReports.length === 0 ? (
+                  ) : dashboardData.recentReports?.length === 0 ? (
                     <tr>
                       <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                         No reports found
                       </td>
                     </tr>
                   ) : (
-                    dashboardData.recentReports.map((report, index) => (
+                    dashboardData.recentReports?.map((report, index) => (
                       <tr key={report.id || index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -481,15 +495,19 @@ export default function HydroGuardDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center mr-3">
-                              <span className="text-white text-xs font-medium">
+                              <span className="text-white text-sm font-medium">
                                 {report.assignedBy.split(' ').map(n => n[0]).join('').toUpperCase()}
                               </span>
                             </div>
                             <span className="text-sm text-gray-900">{report.assignedBy}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.date}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.location}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {report.date}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {report.location}
+                        </td>
                       </tr>
                     ))
                   )}

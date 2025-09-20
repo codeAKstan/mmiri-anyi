@@ -12,13 +12,13 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-r from-[#076DD700] to-[#076DD700] border-b border-blue-200/30">
       {/* Left Cloud */}
       <div 
-        className="absolute left-0 top-0 w-48 h-24 bg-no-repeat bg-cover opacity-80"
+        className="absolute left-0 top-0 w-24 h-12 sm:w-48 sm:h-24 bg-no-repeat bg-cover opacity-80"
         style={{ backgroundImage: 'url(/left-cloud.png)' }}
       ></div>
       
       {/* Right Cloud */}
       <div 
-        className="absolute right-0 top-[-10] w-45 h-24 bg-no-repeat bg-cover opacity-80"
+        className="absolute right-0 top-[-10] w-24 h-12 sm:w-45 sm:h-24 bg-no-repeat bg-cover opacity-80"
         style={{ backgroundImage: 'url(/right-cloud.png)' }}
       ></div>
       
@@ -32,7 +32,7 @@ export default function Header() {
               alt="MMIRI ANYI"
               width={128}
               height={128}
-              className="mr-8"
+              className="mr-4 sm:mr-8 w-16 h-16 sm:w-32 sm:h-32"
             />
           </div>
           
