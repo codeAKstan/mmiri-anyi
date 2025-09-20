@@ -44,7 +44,7 @@ export async function stewardAuthMiddleware(request) {
     }
 
     // Check if steward account is active
-    if (steward.status !== 'active') {
+    if (steward.status !== 'Active') {
       return {
         success: false,
         error: 'Account is not active',
@@ -53,6 +53,9 @@ export async function stewardAuthMiddleware(request) {
     }
 
     // Return success with steward data
+    console.log('DEBUG: Steward auth middleware - steward._id:', steward._id);
+    console.log('DEBUG: Steward auth middleware - steward._id type:', typeof steward._id);
+    
     return {
       success: true,
       steward: steward,

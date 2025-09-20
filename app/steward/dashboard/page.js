@@ -10,6 +10,8 @@ export default function StewardDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [reports, setReports] = useState([]);
+  const [assignedReports, setAssignedReports] = useState([]);
+  const [createdReports, setCreatedReports] = useState([]);
   const [stats, setStats] = useState({
     totalReports: 0,
     pendingReports: 0,
@@ -50,17 +52,22 @@ export default function StewardDashboard() {
       
       if (reportsResponse.ok) {
         const reportsData = await reportsResponse.json();
-        setReports(reportsData.reports || []);
         
-        // Calculate stats
-        const total = reportsData.reports?.length || 0;
-        const pending = reportsData.reports?.filter(r => r.status === 'pending')?.length || 0;
-        const resolved = reportsData.reports?.filter(r => r.status === 'resolved')?.length || 0;
-        const thisMonth = reportsData.reports?.filter(r => {
+        // Set all reports data
+        setReports(reportsData.allReports || []);
+        setAssignedReports(reportsData.assignedReports || []);
+        setCreatedReports(reportsData.createdReports || []);
+        
+        // Calculate stats based on all reports
+        const allReports = reportsData.allReports || [];
+        const total = allReports.length;
+        const pending = allReports.filter(r => r.status === 'pending').length;
+        const resolved = allReports.filter(r => r.status === 'resolved').length;
+        const thisMonth = allReports.filter(r => {
           const reportDate = new Date(r.createdAt);
           const now = new Date();
           return reportDate.getMonth() === now.getMonth() && reportDate.getFullYear() === now.getFullYear();
-        })?.length || 0;
+        }).length;
         
         setStats({
           totalReports: total,
@@ -148,6 +155,16 @@ export default function StewardDashboard() {
               }`}
             >
               Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('assigned')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'assigned'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Assigned Reports
             </button>
             <button
               onClick={() => setActiveTab('reports')}
@@ -269,6 +286,99 @@ export default function StewardDashboard() {
           </div>
         )}
 
+        {activeTab === 'assigned' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Assigned Reports</h2>
+              <div className="text-sm text-gray-600">
+                Reports assigned to you by the admin
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              {assignedReports.length === 0 ? (
+                <div className="text-center py-12">
+                  <Image
+                    src="/droplet.png"
+                    alt="No assigned reports"
+                    width={64}
+                    height={64}
+                    className="mx-auto mb-4 opacity-50"
+                  />
+                  <p className="text-gray-500">No reports assigned to you yet</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    The admin will assign reports for you to handle
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Location
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Issue Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Priority
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tracking #
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {assignedReports.map((report) => (
+                        <tr key={report._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {formatDate(report.createdAt)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {report.location}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {report.issueType}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              report.status === 'resolved' 
+                                ? 'bg-green-100 text-green-800'
+                                : report.status === 'in-progress'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {report.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              report.priority === 'high'
+                                ? 'bg-red-100 text-red-800'
+                                : report.priority === 'medium'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {report.priority}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {activeTab === 'reports' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -282,7 +392,7 @@ export default function StewardDashboard() {
             </div>
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
-              {reports.length === 0 ? (
+              {createdReports.length === 0 ? (
                 <div className="text-center py-12">
                   <Image
                     src="/droplet.png"
@@ -322,7 +432,7 @@ export default function StewardDashboard() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {reports.map((report) => (
+                      {createdReports.map((report) => (
                         <tr key={report._id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {formatDate(report.createdAt)}

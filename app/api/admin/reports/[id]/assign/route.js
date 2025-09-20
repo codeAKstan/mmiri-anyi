@@ -3,6 +3,7 @@ import Report from '../../../../../../models/Report';
 import Steward from '../../../../../../models/Steward';
 import { withAdminAuth } from '../../../../../../middleware/adminAuth';
 import nodemailer from 'nodemailer';
+import mongoose from 'mongoose';
 
 // Create email transporter
 const createTransporter = () => {
@@ -224,15 +225,30 @@ async function assignReport(request, { params }) {
     }
 
     // Update the report
+    console.log('DEBUG: Assigning report to steward:', {
+      reportId,
+      stewardId,
+      stewardIdType: typeof stewardId
+    });
+    
+    // Ensure stewardId is converted to ObjectId
+    const stewardObjectId = new mongoose.Types.ObjectId(stewardId);
+    
     const updatedReport = await Report.findByIdAndUpdate(
       reportId,
       {
-        assignedTo: stewardId,
+        assignedTo: stewardObjectId,
         status: 'in-progress',
         assignedDate: new Date()
       },
       { new: true }
     ).populate('assignedTo', 'name employeeId department email');
+
+    console.log('DEBUG: Report updated successfully:', {
+      reportId: updatedReport._id,
+      assignedTo: updatedReport.assignedTo,
+      status: updatedReport.status
+    });
 
     // Send email notifications (don't wait for them to complete)
     Promise.all([

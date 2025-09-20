@@ -54,7 +54,8 @@ const reportSchema = new mongoose.Schema({
     default: 'pending'
   },
   assignedTo: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Steward',
     default: null
   },
   notes: [{

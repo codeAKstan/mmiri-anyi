@@ -324,10 +324,10 @@ export default function AdminReports() {
                         {report.assignedTo ? (
                           <div>
                             <div className="text-sm font-medium text-gray-900">
-                              {report.assignedTo.name}
+                              {report.assignedTo.name || 'Unknown Steward'}
                             </div>
                             <div className="text-xs text-gray-500">
-                              ID: {report.assignedTo.employeeId}
+                              ID: {report.assignedTo.employeeId || 'N/A'}
                             </div>
                           </div>
                         ) : (
