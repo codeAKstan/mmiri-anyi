@@ -199,15 +199,18 @@ export default function HydroGuardDashboard() {
                   </button>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="relative">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <div className="relative hidden sm:block">
                   <input
                     type="text"
                     placeholder="Search Report ID / Location"
-                    className="w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-64 lg:w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 </div>
+                <button className="p-2 text-gray-400 hover:text-gray-500 sm:hidden">
+                  <Search className="h-5 w-5" />
+                </button>
                 <button className="p-2 text-gray-400 hover:text-gray-500">
                   <Sun className="h-5 w-5" />
                 </button>
@@ -220,10 +223,10 @@ export default function HydroGuardDashboard() {
         </div>
 
         {/* Dashboard content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 text-balance">
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-balance">
               Saving Communities, Building Sustainable Water Systems.
             </h2>
           </div>
