@@ -50,7 +50,7 @@ export default function Header() {
             <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
               How it works
             </a>
-            <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
+            <a href="/track" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
               Track Report
             </a>
             <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
@@ -98,7 +98,7 @@ export default function Header() {
               <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 How it works
               </a>
-              <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
+              <a href="/track" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 Track Report
               </a>
               <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
