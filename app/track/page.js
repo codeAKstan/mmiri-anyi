@@ -29,12 +29,17 @@ export default function TrackReport() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch report');
+        if (response.status === 500) {
+          throw new Error('We are experiencing technical difficulties with our database. Please try again later.');
+        } else {
+          throw new Error(data.error || 'Failed to fetch report');
+        }
       }
       
       setReport(data.report);
       setSearched(true);
     } catch (err) {
+      console.error('Error fetching report:', err);
       setError(err.message || 'An error occurred while fetching the report');
     } finally {
       setLoading(false);
@@ -140,7 +145,7 @@ export default function TrackReport() {
                 <div className="flex flex-col md:flex-row justify-between mb-6">
                   <div>
                     <p className="text-sm text-gray-500">Tracking Number</p>
-                    <p className="text-lg font-mono font-medium">{report.trackingNumber}</p>
+                    <p className="text-lg text-black font-mono font-medium">{report.trackingNumber}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Status</p>
