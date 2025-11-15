@@ -4,8 +4,9 @@ import Image from "next/image";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
-export default function ReportLeak() {
+export default function ReportIssue() {
   const [formData, setFormData] = useState({
+    category: '',
     issueType: '',
     location: '',
     ward: '',
@@ -79,10 +80,10 @@ export default function ReportLeak() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Report Submitted Successfully!</h2>
             <p className="text-gray-600 mb-6">
-              Thank you for reporting this water issue. Your report has been received and assigned tracking ID: <strong>{trackingNumber}</strong>
+              Thank you for reporting this issue. Your report has been received and assigned tracking ID: <strong>{trackingNumber}</strong>
             </p>
             <p className="text-gray-600 mb-8">
-              Our water stewards have been notified and will respond within 24 hours. You'll receive Email updates on the progress.
+              Our stewards have been notified and will respond within 24 hours. You'll receive email updates on the progress.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
@@ -90,6 +91,7 @@ export default function ReportLeak() {
                   setSubmitSuccess(false);
                   setTrackingNumber('');
                   setFormData({
+                    category: '',
                     issueType: '',
                     location: '',
                     ward: '',
@@ -128,9 +130,9 @@ export default function ReportLeak() {
       {/* Hero Section */}
       <div className="bg-blue-600 text-white py-12 pt-30">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Report a Water Issue</h1>
+          <h1 className="text-4xl font-bold mb-4">Report a Community Issue</h1>
           <p className="text-xl text-blue-100">
-            Help us keep our community safe by reporting water leaks, pipe bursts, or water shortages
+            Help us keep our community safe by reporting issues like water, roads, street lighting, and waste management
           </p>
         </div>
       </div>
@@ -144,27 +146,40 @@ export default function ReportLeak() {
           </div>
           
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Issue Type */}
+            {/* Category */}
             <div>
               <label className="block text-sm font-medium text-[#000000] mb-2">
-                Type of Water Issue *
+                Issue Category *
               </label>
               <select
-                name="issueType"
-                value={formData.issueType}
+                name="category"
+                value={formData.category || ''}
                 onChange={handleInputChange}
                 required
                 className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">Select issue type</option>
-                <option value="pipe-burst">Pipe Burst</option>
-                <option value="leak">Water Leak</option>
-                <option value="no-water">No Water Supply</option>
-                <option value="contamination">Contaminated Water</option>
-                <option value="low-water-pressure">Low Water Pressure</option>
-                <option value="pressure-issue">Pressure Issue</option>
-                <option value="other">Other</option>
+                <option value="">Select category</option>
+                <option value="water">Water</option>
+                <option value="roads">Roads</option>
+                <option value="lighting">Lighting</option>
+                <option value="waste">Waste</option>
               </select>
+            </div>
+
+            {/* Issue Type */}
+            <div>
+              <label className="block text-sm font-medium text-[#000000] mb-2">
+                Type of Issue *
+              </label>
+              <input
+                type="text"
+                name="issueType"
+                value={formData.issueType}
+                onChange={handleInputChange}
+                required
+                placeholder="e.g., Pipe Burst, Road Pothole, Broken Streetlight, Overflowing Waste Bin"
+                className="w-full bg-[#F3FBFF] text-[#000000] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
 
             {/* Location Details */}
@@ -261,7 +276,7 @@ export default function ReportLeak() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <p className="text-gray-600 mb-2">
-                      {formData.image ? formData.image.name : 'Click to upload a photo of the water issue'}
+                      {formData.image ? formData.image.name : 'Click to upload a photo of the issue'}
                     </p>
                     <p className="text-sm text-gray-500">
                       PNG, JPG, GIF up to 10MB
@@ -399,7 +414,7 @@ export default function ReportLeak() {
                     Submitting Report...
                   </div>
                 ) : (
-                  'Submit Water Issue Report'
+                  'Submit Issue Report'
                 )}
               </button>
               
@@ -424,7 +439,7 @@ export default function ReportLeak() {
                 If this is a life-threatening emergency or major pipe burst causing flooding, please call our emergency hotline immediately:
               </p>
               <p className="text-xl font-bold text-red-800 mt-2">+234 800 WATER (92837)</p>
-              <p className="text-sm text-red-600 mt-1">Available 24/7 for emergency water issues</p>
+              <p className="text-sm text-red-600 mt-1">Available 24/7 for emergencies</p>
             </div>
           </div>
         </div>

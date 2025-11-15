@@ -22,13 +22,16 @@ export async function POST(request) {
     const formData = await request.formData();
     
     const reportData = {
+      category: formData.get('category') || 'water',
       issueType: formData.get('issueType'),
       location: formData.get('location'),
       description: formData.get('description'),
       severity: formData.get('severity'),
       name: formData.get('reporterName'),
       phone: formData.get('phoneNumber'),
-      email: formData.get('email')
+      email: formData.get('email'),
+      ward: formData.get('ward') || '',
+      landmark: formData.get('landmark') || ''
     };
 
     // Validate required fields
@@ -82,7 +85,7 @@ export async function POST(request) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center;">
             <h1 style="margin: 0; font-size: 28px;">Communifi</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Water Issue Report Confirmation</p>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Issue Report Confirmation</p>
           </div>
           
           <div style="padding: 30px; background: #f8fafc;">
@@ -97,6 +100,10 @@ export async function POST(request) {
               <h3 style="color: #1e40af; margin-top: 0;">Report Details</h3>
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
+                  <td style="padding: 8px 0; font-weight: bold; color: #374151;">Category:</td>
+                  <td style="padding: 8px 0; color: #6b7280; text-transform: capitalize;">${reportData.category}</td>
+                </tr>
+                <tr>
                   <td style="padding: 8px 0; font-weight: bold; color: #374151;">Issue Type:</td>
                   <td style="padding: 8px 0; color: #6b7280;">${reportData.issueType}</td>
                 </tr>
@@ -104,6 +111,8 @@ export async function POST(request) {
                   <td style="padding: 8px 0; font-weight: bold; color: #374151;">Location:</td>
                   <td style="padding: 8px 0; color: #6b7280;">${reportData.location}</td>
                 </tr>
+                ${reportData.ward ? `<tr><td style="padding: 8px 0; font-weight: bold; color: #374151;">Ward/Zone:</td><td style="padding: 8px 0; color: #6b7280;">${reportData.ward}</td></tr>` : ''}
+                ${reportData.landmark ? `<tr><td style="padding: 8px 0; font-weight: bold; color: #374151;">Landmark:</td><td style="padding: 8px 0; color: #6b7280;">${reportData.landmark}</td></tr>` : ''}
                 <tr>
                   <td style="padding: 8px 0; font-weight: bold; color: #374151;">Severity:</td>
                   <td style="padding: 8px 0; color: #6b7280;">${reportData.severity}</td>
@@ -138,7 +147,7 @@ export async function POST(request) {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: reportData.email,
-        subject: `Water Issue Report Confirmation - ${newReport.trackingNumber}`,
+        subject: `Issue Report Confirmation - ${newReport.trackingNumber}`,
         html: emailHtml
       });
     } catch (emailError) {

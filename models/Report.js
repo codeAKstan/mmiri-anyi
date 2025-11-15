@@ -8,10 +8,15 @@ const reportSchema = new mongoose.Schema({
       return 'WL' + Date.now() + Math.random().toString(36).substring(2, 7).toUpperCase();
     }
   },
+  category: {
+    type: String,
+    enum: ['water', 'roads', 'lighting', 'waste'],
+    default: 'water'
+  },
   issueType: {
     type: String,
     required: true,
-    enum: ['pipe-burst', 'leak', 'no-water', 'contamination', 'pressure-issue', 'low-water-pressure', 'other']
+    trim: true
   },
   location: {
     type: String,
@@ -22,6 +27,16 @@ const reportSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  ward: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  landmark: {
+    type: String,
+    trim: true,
+    default: ''
   },
   severity: {
     type: String,
