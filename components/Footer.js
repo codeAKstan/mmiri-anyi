@@ -11,7 +11,7 @@ export default function Footer() {
             <div className="flex items-center mb-6">
               <Image
                 src="/footer-logo.png"
-                alt="MMIRI ANYI Logo"
+                alt="Communifi Logo"
                 width={68}
                 height={68}
                 className="mr-3"
@@ -88,7 +88,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="text-sm text-gray-400">Email Support</p>
-                <p className="font-semibold">support@mmirianyi.ng</p>
+                <p className="font-semibold">support@communifi.ng</p>
               </div>
             </div>
             
@@ -110,7 +110,7 @@ export default function Footer() {
         {/* Bottom Footer */}
         <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm mb-4 md:mb-0">
-            © 2024 MMIRI ANYI. All rights reserved. Building safer communities through technology.
+            © 2024 Communifi. All rights reserved. Building safer communities through technology.
           </div>
           <div className="flex space-x-6 text-sm">
             <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a>

@@ -24,11 +24,11 @@ const sendCitizenNotification = async (report, steward) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: report.email,
-      subject: 'Your Water Quality Report Has Been Assigned - Mmiri Anyi',
+      subject: 'Your Water Quality Report Has Been Assigned - Communifi',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #2563eb; color: white; padding: 20px; text-align: center;">
-            <h1>Mmiri Anyi - Report Update</h1>
+            <h1>Communifi - Report Update</h1>
           </div>
           
           <div style="padding: 20px; background-color: #f9fafb;">
@@ -59,7 +59,7 @@ const sendCitizenNotification = async (report, steward) => {
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
               <p style="color: #6b7280; font-size: 14px;">
-                This is an automated message from Mmiri Anyi Water Quality Management System.
+                This is an automated message from Communifi Water Quality Management System.
                 <br>If you have any questions, please contact our support team.
               </p>
             </div>
@@ -83,11 +83,11 @@ const sendStewardNotification = async (report, steward) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: steward.email,
-      subject: 'New Report Assignment - Mmiri Anyi',
+      subject: 'New Report Assignment - Communifi',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #059669; color: white; padding: 20px; text-align: center;">
-            <h1>Mmiri Anyi - New Assignment</h1>
+            <h1>Communifi - New Assignment</h1>
           </div>
           
           <div style="padding: 20px; background-color: #f9fafb;">
@@ -127,7 +127,7 @@ const sendStewardNotification = async (report, steward) => {
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
               <p style="color: #6b7280; font-size: 14px;">
-                This is an automated message from Mmiri Anyi Water Quality Management System.
+                This is an automated message from Communifi Water Quality Management System.
                 <br>If you have any questions about this assignment, please contact the admin team.
               </p>
             </div>

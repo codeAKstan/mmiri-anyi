@@ -114,7 +114,7 @@ export default function StewardDashboard() {
             <div className="flex items-center">
               <Image
                 src="/mmiri-logo.png"
-                alt="Mmiri Anyi Logo"
+                alt="Communifi Logo"
                 width={40}
                 height={40}
                 className="mr-3"

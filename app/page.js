@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import TabSection from "../components/TabSection";
 import FeaturesSection from "../components/FeaturesSection";
 import ImpactSection from "../components/ImpactSection";
+import IssueSection from "../components/IssueSection";
 import CallToActionSection from "../components/CallToActionSection";
 import Footer from "../components/Footer";
 
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <TabSection />
       <FeaturesSection />
+      <IssueSection />
       <ImpactSection />
       <CallToActionSection />
       <Footer />

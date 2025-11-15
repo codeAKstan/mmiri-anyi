@@ -190,7 +190,7 @@ export default function AdminReports() {
               </button>
               <Image
                 src="/mmiri-logo.png"
-                alt="Mmiri Anyi Logo"
+                alt="Communifi Logo"
                 width={40}
                 height={40}
                 className="mr-3"

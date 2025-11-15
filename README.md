@@ -1,6 +1,6 @@
-# Mmiri anyi
+# Communifi
 
-Mmiri anyi is a comprehensive water management and monitoring system built with Next.js. The application provides real-time water quality monitoring, usage tracking, and intelligent alerts to help protect and manage water resources effectively.
+Communifi is a comprehensive water management and monitoring system built with Next.js. The application provides real-time water quality monitoring, usage tracking, and intelligent alerts to help protect and manage water resources effectively.
 
 ## 🌊 Features
 
@@ -31,7 +31,7 @@ Mmiri anyi is a comprehensive water management and monitoring system built with 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd mmiri-anyi
+cd communifi
 ```
 
 2. Install dependencies:
@@ -59,7 +59,7 @@ bun dev
 ## 📁 Project Structure
 
 ```
-mmiri-anyi/
+communifi/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API routes (backend)
 │   ├── components/        # Reusable UI components
@@ -97,7 +97,7 @@ This project uses Tailwind CSS v4 for styling with a custom design system:
 
 ## 📊 Data Visualization
 
-Mmiri anyi includes interactive charts and graphs for:
+Communifi includes interactive charts and graphs for:
 - Water quality trends over time
 - Usage patterns and consumption analytics
 - Alert frequency and response times
@@ -114,7 +114,7 @@ Mmiri anyi includes interactive charts and graphs for:
 
 ### Vercel (Recommended)
 
-The easiest way to deploy Mmiri anyi is using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme):
+The easiest way to deploy Communifi is using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme):
 
 1. Push your code to GitHub
 2. Connect your repository to Vercel
@@ -123,7 +123,7 @@ The easiest way to deploy Mmiri anyi is using the [Vercel Platform](https://verc
 
 ### Other Platforms
 
-Mmiri anyi can be deployed on any platform that supports Next.js:
+Communifi can be deployed on any platform that supports Next.js:
 - Netlify
 - AWS Amplify
 - Railway

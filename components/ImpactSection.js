@@ -145,7 +145,7 @@ export default function ImpactSection() {
                 </div>
               </div>
               <p className="text-gray-700 text-sm italic">
-                "Since we started using MMIRI ANYI, it's been easier to respond fast and track every issue. No more confusion just clear reports and clear actions"
+                "Since we started using Communifi, it's been easier to respond fast and track every issue. No more confusion just clear reports and clear actions"
               </p>
             </div>
 

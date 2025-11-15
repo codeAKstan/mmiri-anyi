@@ -34,12 +34,12 @@ async function sendStewardCredentials(stewardData, password) {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER || 'noreply@mmiri-anyi.com',
+    from: process.env.EMAIL_USER || 'noreply@communifi.com',
     to: stewardData.email,
-    subject: 'Welcome to Mmiri Anyi - Your Steward Account Details',
+    subject: 'Welcome to Communifi - Your Steward Account Details',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">Welcome to Mmiri Anyi</h2>
+        <h2 style="color: #2563eb;">Welcome to Communifi</h2>
         <p>Dear ${stewardData.name},</p>
         <p>Your steward account has been successfully created. Below are your login credentials:</p>
         
@@ -56,11 +56,11 @@ async function sendStewardCredentials(stewardData, password) {
           <p style="margin: 0;"><strong>Important:</strong> Please change your password after your first login for security purposes.</p>
         </div>
         
-        <p>You can access the system at: <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://mmirianyi.vercel.app'}/steward/login">Steward Portal</a></p>
+        <p>You can access the system at: <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://communifi.vercel.app'}/steward/login">Steward Portal</a></p>
         
         <p>If you have any questions, please contact your administrator.</p>
         
-        <p>Best regards,<br>Mmiri Anyi Administration Team</p>
+        <p>Best regards,<br>Communifi Administration Team</p>
       </div>
     `
   };

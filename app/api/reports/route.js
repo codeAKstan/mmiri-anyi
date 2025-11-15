@@ -81,7 +81,7 @@ export async function POST(request) {
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center;">
-            <h1 style="margin: 0; font-size: 28px;">MMIRI ANYI</h1>
+            <h1 style="margin: 0; font-size: 28px;">Communifi</h1>
             <p style="margin: 10px 0 0 0; opacity: 0.9;">Water Issue Report Confirmation</p>
           </div>
           
@@ -125,14 +125,14 @@ export async function POST(request) {
             <div style="text-align: center; margin: 30px 0;">
               <p style="color: #6b7280;">Need immediate assistance?</p>
               <p style="color: #1e40af; font-weight: bold;">📞 +234 813 1944 801</p>
-              <p style="color: #1e40af; font-weight: bold;">✉️ help@mmirianyi.com</p>
-            </div>
-          </div>
-          
-          <div style="background: #1e293b; color: #94a3b8; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0;">© 2024 MMIRI ANYI - Community Driven Smart Water Monitoring System</p>
+              <p style="color: #1e40af; font-weight: bold;">✉️ help@communifi.com</p>
           </div>
         </div>
+        
+        <div style="background: #1e293b; color: #94a3b8; padding: 20px; text-align: center; font-size: 14px;">
+          <p style="margin: 0;">© 2024 Communifi - Community Driven Smart Water Monitoring System</p>
+        </div>
+      </div>
       `;
 
       await transporter.sendMail({

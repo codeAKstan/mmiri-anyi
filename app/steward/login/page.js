@@ -64,7 +64,7 @@ export default function StewardLogin() {
           <div className="mx-auto h-20 w-20 relative mb-4">
             <Image
               src="/mmiri-logo.png"
-              alt="Mmiri Anyi Logo"
+              alt="Communifi Logo"
               fill
               className="object-contain"
             />
@@ -165,7 +165,7 @@ export default function StewardLogin() {
 
         {/* Additional Info */}
         <div className="text-center text-sm text-gray-500">
-          <p>© 2024 Mmiri Anyi. All rights reserved.</p>
+          <p>© 2024 Communifi. All rights reserved.</p>
         </div>
       </div>
     </div>

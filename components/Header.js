@@ -29,7 +29,7 @@ export default function Header() {
           <div className="flex items-center">
             <Image
               src="/mmiri-logo.png"
-              alt="MMIRI ANYI"
+              alt="Communifi"
               width={128}
               height={128}
               className="mr-8"

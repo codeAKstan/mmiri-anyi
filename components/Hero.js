@@ -29,22 +29,20 @@ export default function Hero() {
               className="mr-2"
             />
             <p className="text-[#000000] font-medium text-sm">
-              Secure, transparent water tracking built for lasting impact
+              Simple, transparent civic reporting built for lasting impact
             </p>
           </div>
 
           {/* Main heading */}
           <h1 className="text-xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
-            Empowering People of Enugu
+            Report, track and stay informed
             <br />
-            <span className="text-[#000]">Protecting Every Drop of water</span>
+            <span className="text-[#000]">about local issues in your community</span>
           </h1>
 
           {/* Description */}
           <p className="text-lg md:text-2xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed">
-            A community driven smart water monitoring system for Enugu state,
-            reduces waste and brings the government closer to the communities
-            it serves, working together to detect, report and resolve water issues
+            Community driven civic issues (like water issues, road potholes, street lighting, waste management issues) reporting platform that connects citizens and local authorities, enabling people to detect, report and resolve everyday problems
           </p>
 
           {/* Action buttons */}
