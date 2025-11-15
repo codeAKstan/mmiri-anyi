@@ -9,7 +9,7 @@ export default function Header() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-r from-[#076DD700] to-[#076DD700] border-b border-blue-200/30">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-r from-[#ffffff] to-[#ffffff] border-b border-blue-200/30">
       {/* Left Cloud */}
       <div 
         className="absolute left-0 top-0 w-48 h-24 bg-no-repeat bg-cover opacity-80"
@@ -47,7 +47,7 @@ export default function Header() {
             <a href="/about" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
               About
             </a>
-            <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
+            <a href="/how-it-works" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
               How it works
             </a>
             <a href="/track" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
@@ -95,7 +95,7 @@ export default function Header() {
               <a href="/about" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 About
               </a>
-              <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
+              <a href="/how-it-works" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 How it works
               </a>
               <a href="/track" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
