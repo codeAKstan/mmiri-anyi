@@ -41,10 +41,10 @@ export default function Header() {
           
           {/* Navigation Menu */}
           <nav className="hidden md:flex space-x-8 mr-8">
-            <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
+            <a href="/" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
               Home
             </a>
-            <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
+            <a href="/about" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
               About
             </a>
             <a href="#" className="text-blue-800 hover:text-blue-600 font-medium transition-colors">
@@ -89,10 +89,10 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-sm border-t border-blue-200/30">
             <div className="px-4 py-4 space-y-3">
-              <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
+              <a href="/" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 Home
               </a>
-              <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
+              <a href="/about" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
                 About
               </a>
               <a href="#" className="block text-blue-800 hover:text-blue-600 font-medium py-2 transition-colors">
