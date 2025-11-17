@@ -16,8 +16,9 @@ import {
   CheckCircle,
   Clock,
   MapPin,
-  Droplets,
+  Trash2,
 } from "lucide-react"
+import AdminSidebar from "../../../components/AdminSidebar"
 
 export default function HydroGuardDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -32,6 +33,12 @@ export default function HydroGuardDashboard() {
     adminProfile: null
   })
   const [loading, setLoading] = useState(true)
+  const [viewOpen, setViewOpen] = useState(false)
+  const [viewLoading, setViewLoading] = useState(false)
+  const [viewError, setViewError] = useState('')
+  const [selectedReport, setSelectedReport] = useState(null)
+  const [stewards, setStewards] = useState([])
+  const [assignSteward, setAssignSteward] = useState('')
 
   useEffect(() => {
     fetchDashboardData()
@@ -51,6 +58,36 @@ export default function HydroGuardDashboard() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const openReportModal = async (tracking) => {
+    try {
+      setViewOpen(true)
+      setViewLoading(true)
+      setViewError('')
+      const res = await fetch(`/api/reports?tracking=${tracking}`)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to load report')
+      setSelectedReport(data.report)
+    } catch (e) {
+      setViewError(e.message || 'Failed to load report')
+    } finally {
+      setViewLoading(false)
+    }
+    try {
+      const sRes = await fetch('/api/admin/stewards')
+      if (sRes.ok) {
+        const sData = await sRes.json()
+        setStewards(sData.stewards || [])
+      }
+    } catch {}
+  }
+
+  const closeReportModal = () => {
+    setViewOpen(false)
+    setSelectedReport(null)
+    setAssignSteward('')
+    setViewError('')
   }
 
   const handleLogout = async () => {
@@ -88,93 +125,7 @@ export default function HydroGuardDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex lg:flex-shrink-0`}
-      >
-        <div className="flex flex-col w-full">
-          {/* Logo */}
-          <div className="flex items-center px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <Droplets className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900">HydroGuard</h1>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            <a
-              href="#"
-              className="bg-blue-50 text-blue-700 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
-            >
-              <BarChart3 className="text-blue-600 mr-3 h-5 w-5" />
-              Overview
-            </a>
-            <a
-              href="/admin/reports"
-              className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
-            >
-              <FileText className="text-gray-400 mr-3 h-5 w-5" />
-              Issue Report
-            </a>
-            <a
-              href="/admin/stewards"
-              className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
-            >
-              <Users className="text-gray-400 mr-3 h-5 w-5" />
-              Stewards
-            </a>
-            <a
-              href="#"
-              className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
-            >
-              <User className="text-gray-400 mr-3 h-5 w-5" />
-              User Profile
-            </a>
-            <a
-              href="#"
-              className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
-            >
-              <BarChart3 className="text-gray-400 mr-3 h-5 w-5" />
-              Analytics
-            </a>
-            <a
-              href="#"
-              className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg"
-            >
-              <Settings className="text-gray-400 mr-3 h-5 w-5" />
-              Settings
-            </a>
-          </nav>
-
-          {/* User Profile */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="flex items-center mb-3">
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">
-                    {loading ? '...' : dashboardData.adminProfile?.initials || 'AD'}
-                  </span>
-                </div>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">
-                  {loading ? 'Loading...' : dashboardData.adminProfile?.name || 'Admin'}
-                </p>
-                <p className="text-xs text-gray-500">Admin</p>
-              </div>
-            </div>
-            <button 
-              onClick={handleLogout}
-              className="flex items-center text-sm text-red-600 hover:text-red-800"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Log out
-            </button>
-          </div>
-        </div>
-      </div>
+      <AdminSidebar open={sidebarOpen} adminProfile={dashboardData.adminProfile} onLogout={handleLogout} />
 
       {/* Main content */}
       <div className="flex-1 lg:ml-0 overflow-hidden">
@@ -444,18 +395,21 @@ export default function HydroGuardDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {loading ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                      <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                         Loading reports...
                       </td>
                     </tr>
                   ) : dashboardData.recentReports.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                      <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                         No reports found
                       </td>
                     </tr>
@@ -490,6 +444,22 @@ export default function HydroGuardDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.date}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.location}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => openReportModal(report.id)}
+                              className="inline-flex items-center px-4 py-2 bg-[#4F8FEA] hover:bg-[#3E7AD0] text-white rounded-2xl shadow-sm"
+                            >
+                              View
+                            </button>
+                            <button
+                              className="inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-gray-800 rounded-2xl hover:bg-gray-50"
+                              aria-label="Delete report"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -497,6 +467,93 @@ export default function HydroGuardDashboard() {
               </table>
             </div>
           </div>
+          {viewOpen && (
+            <div className="fixed inset-0 z-50">
+              <div className="absolute inset-0 bg-black/40" onClick={closeReportModal}></div>
+              <div className="absolute inset-y-12 left-1/2 -translate-x-1/2 w-[95%] max-w-xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div className="flex items-center text-black justify-between px-6 py-4 border-b">
+                  <div className="font-semibold">{selectedReport ? `Report Details - ${selectedReport.trackingNumber}` : 'Report Details'}</div>
+                  <button onClick={closeReportModal} className="text-gray-500 hover:text-gray-700">✕</button>
+                </div>
+                <div className="p-6 overflow-y-auto">
+                  {viewLoading && (
+                    <div className="text-center text-gray-600">Loading...</div>
+                  )}
+                  {viewError && (
+                    <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">{viewError}</div>
+                  )}
+                  {selectedReport && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2">
+                        {selectedReport.category && (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 capitalize">{selectedReport.category}</span>
+                        )}
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(selectedReport.status)}`}>{selectedReport.status}</span>
+                      </div>
+                      <div className="text-sm text-gray-700 flex items-center gap-2">
+                        <span>📍</span>
+                        <span>{selectedReport.location}</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900 mb-2">Description</div>
+                        <p className="text-sm text-gray-700">{selectedReport.description}</p>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900 mb-3">Photo Evidence</div>
+                        {selectedReport.imageUrl ? (
+                          <div className="flex gap-3">
+                            <img src={selectedReport.imageUrl} alt="evidence" className="w-40 h-28 object-cover rounded-md" />
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-500">No image</div>
+                        )}
+                        <div className="grid grid-cols-2 gap-4 mt-3 text-sm text-gray-700">
+                          <div><div className="text-gray-500">Reported by</div><div className="font-medium">{selectedReport.name}</div></div>
+                          <div><div className="text-gray-500">Reported Date</div><div className="font-medium">{new Date(selectedReport.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900 mb-3">Status Timeline</div>
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs">✓</div>
+                            <div>
+                              <div className="font-medium">Reported</div>
+                              <div className="text-xs text-gray-500">{new Date(selectedReport.createdAt).toLocaleString()}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs">✓</div>
+                            <div>
+                              <div className="font-medium capitalize">{selectedReport.status.replace('-', ' ')}</div>
+                              <div className="text-xs text-gray-500">{new Date(selectedReport.updatedAt).toLocaleString()}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900 mb-2">Assign to Steward</div>
+                        <div className="flex gap-3">
+                          <select value={assignSteward} onChange={(e) => setAssignSteward(e.target.value)} className="flex-1 px-3 py-2 border text-black rounded-md text-sm">
+                            <option value="">Select a steward</option>
+                            {stewards.map(s => (
+                              <option key={s._id} value={s._id}>{s.name} ({s.employeeId})</option>
+                            ))}
+                          </select>
+                          <button className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50" disabled={!assignSteward}>Assign</button>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-md">Update Status</button>
+                        <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md">Send Notification</button>
+                        <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md">Export Report</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

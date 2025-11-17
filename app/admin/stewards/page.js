@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminSidebar from '../../../components/AdminSidebar';
+import { AlertTriangle, CheckCircle, Droplets, Trash2 } from 'lucide-react';
 
 export default function StewardsPage() {
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [stewards, setStewards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,6 +29,9 @@ export default function StewardsPage() {
     position: '',
     dateHired: new Date().toISOString().split('T')[0]
   });
+  const [reports, setReports] = useState([]);
+  const [stats, setStats] = useState({ totalStewards: 0, activeStewards: 0, totalActiveIssues: 0, totalResolved: 0 });
+  const [issuesBySteward, setIssuesBySteward] = useState({ active: {}, resolved: {} });
 
   const departments = [
     'Water Quality',
@@ -52,6 +58,8 @@ export default function StewardsPage() {
       if (response.ok) {
         setStewards(data.stewards);
         setPagination(data.pagination);
+        const activeStewards = (data.stewards || []).filter(s => s.status === 'Active').length;
+        setStats(s => ({ ...s, totalStewards: data.pagination?.count || data.stewards.length || 0, activeStewards }));
       } else {
         setError(data.error || 'Failed to fetch stewards');
       }
@@ -181,9 +189,56 @@ export default function StewardsPage() {
     fetchStewards();
   }, [filters]);
 
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const fetchReports = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/reports?limit=100&page=1', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (response.ok) {
+        const data = await response.json();
+        let all = data.reports || [];
+        const totalPages = data.pagination?.total || 1;
+        for (let p = 2; p <= totalPages; p++) {
+          const pr = await fetch(`/api/admin/reports?limit=100&page=${p}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (pr.ok) {
+            const pd = await pr.json();
+            all = all.concat(pd.reports || []);
+          }
+        }
+        setReports(all);
+        const activeCount = all.filter(r => r.status === 'pending' || r.status === 'in-progress').length;
+        const resolvedCount = all.filter(r => r.status === 'resolved').length;
+        setStats(s => ({ ...s, totalActiveIssues: activeCount, totalResolved: resolvedCount }));
+        const activeMap = {};
+        const resolvedMap = {};
+        all.forEach(r => {
+          const sid = r.assignedTo?._id || r.assignedTo || 'none';
+          if (r.status === 'resolved') {
+            resolvedMap[sid] = (resolvedMap[sid] || 0) + 1;
+          } else if (r.status === 'pending' || r.status === 'in-progress') {
+            activeMap[sid] = (activeMap[sid] || 0) + 1;
+          }
+        });
+        setIssuesBySteward({ active: activeMap, resolved: resolvedMap });
+      }
+    } catch {}
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/admin/logout', { method: 'POST' });
+      if (response.ok) router.push('/admin/login');
+    } catch {}
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
+      <AdminSidebar open={sidebarOpen} adminProfile={{}} onLogout={handleLogout} />
       {/* Header */}
+      <div className="flex-1 lg:ml-0 overflow-hidden">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 space-y-4 sm:space-y-0">
@@ -192,12 +247,7 @@ export default function StewardsPage() {
               <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Manage water steward accounts and permissions</p>
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-              <button
-                onClick={() => router.push('/admin/dashboard')}
-                className="w-full sm:w-auto px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors text-center"
-              >
-                ← Back to Dashboard
-              </button>
+              
               <button
                 onClick={() => setShowAddModal(true)}
                 className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -210,6 +260,36 @@ export default function StewardsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl border-2 border-blue-300 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Total Stewards</span>
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mt-2">{stats.totalStewards}</div>
+          </div>
+          <div className="bg-white rounded-xl border-2 border-blue-300 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Active Stewards</span>
+              <CheckCircle className="w-4 h-4 text-green-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mt-2">{stats.activeStewards}</div>
+          </div>
+          <div className="bg-white rounded-xl border-2 border-blue-300 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Total Active Issues</span>
+              <AlertTriangle className="w-4 h-4 text-yellow-500" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mt-2">{stats.totalActiveIssues}</div>
+          </div>
+          <div className="bg-white rounded-xl border-2 border-blue-300 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Total Resolved</span>
+              <Droplets className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mt-2">{stats.totalResolved}</div>
+          </div>
+        </div>
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -320,24 +400,13 @@ export default function StewardsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Steward Info
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Department
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date Hired
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active Issues</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resolved Issues</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -357,49 +426,20 @@ export default function StewardsPage() {
                   stewards.map((steward) => (
                     <tr key={steward._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{steward.name}</div>
-                          <div className="text-sm text-gray-500">ID: {steward.employeeId}</div>
-                          <div className="text-sm text-gray-500">{steward.position}</div>
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center mr-3 text-sm font-semibold text-gray-700">{steward.name?.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}</div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{steward.name}</div>
+                            <div className="text-sm text-gray-500">{steward.phone}</div>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{steward.email}</div>
-                        <div className="text-sm text-gray-500">{steward.phone}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{steward.department}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          steward.status === 'Active' 
-                            ? 'bg-green-100 text-green-800'
-                            : steward.status === 'Inactive'
-                            ? 'bg-gray-100 text-gray-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {steward.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(steward.dateHired).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => openEditModal(steward)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteSteward(steward._id, steward.name)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{steward.email}</div></td>
+                      <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{steward.department}</div></td>
+                      <td className="px-6 py-4 whitespace-nowrap"><span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">{issuesBySteward.active[steward._id] || 0}</span></td>
+                      <td className="px-6 py-4 whitespace-nowrap"><span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">{issuesBySteward.resolved[steward._id] || 0}</span></td>
+                      <td className="px-6 py-4 whitespace-nowrap"><span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${steward.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{steward.status}</span></td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><div className="flex items-center gap-3"><button onClick={() => openEditModal(steward)} className="inline-flex items-center px-4 py-2 bg-[#4F8FEA] hover:bg-[#3E7AD0] text-white rounded-2xl shadow-sm">Edit</button><button onClick={() => handleDeleteSteward(steward._id, steward.name)} className="inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-gray-800 rounded-2xl hover:bg-gray-50"><Trash2 className="w-4 h-4" /></button></div></td>
                     </tr>
                   ))
                 )}
@@ -663,6 +703,7 @@ export default function StewardsPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

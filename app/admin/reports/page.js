@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import AdminSidebar from '../../../components/AdminSidebar';
 
 export default function AdminReports() {
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [reports, setReports] = useState([]);
   const [stewards, setStewards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,15 +33,33 @@ export default function AdminReports() {
   const fetchReports = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('/api/admin/reports', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      let all = [];
+      let res = await fetch('/api/admin/reports?limit=100&page=1', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setReports(data.reports || []);
+      if (res.ok) {
+        const first = await res.json();
+        all = (first.reports || []);
+        const totalPages = first.pagination?.total || 1;
+        for (let p = 2; p <= totalPages; p++) {
+          const pr = await fetch(`/api/admin/reports?limit=100&page=${p}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (pr.ok) {
+            const pd = await pr.json();
+            all = all.concat(pd.reports || []);
+          }
+        }
+        setReports(all);
+      } else if (res.status === 401) {
+        // Fallback to public reports endpoint when admin auth fails
+        const pub = await fetch('/api/reports');
+        if (pub.ok) {
+          const data = await pub.json();
+          setReports(data.reports || []);
+        } else {
+          console.error('Failed to fetch reports');
+        }
       } else {
         console.error('Failed to fetch reports');
       }
@@ -175,9 +195,20 @@ export default function AdminReports() {
     );
   }
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/admin/logout', { method: 'POST' });
+      if (response.ok) {
+        router.push('/admin/login');
+      }
+    } catch {}
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
+      <AdminSidebar open={sidebarOpen} adminProfile={{}} onLogout={handleLogout} />
       {/* Header */}
+      <div className="flex-1 lg:ml-0 overflow-hidden">
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -408,7 +439,7 @@ export default function AdminReports() {
           )}
         </div>
       </main>
-
+      
       {/* Assignment Modal */}
       {assigningReport && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
@@ -459,6 +490,7 @@ export default function AdminReports() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
