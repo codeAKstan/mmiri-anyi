@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { BarChart3, FileText, Users, User, Bell, Search, Info, CheckCircle, Clock, ClipboardCheck, LogOut } from 'lucide-react';
+import StewardSidebar from '../../../components/StewardSidebar';
 
 export default function StewardDashboard() {
   const router = useRouter();
@@ -26,6 +27,8 @@ export default function StewardDashboard() {
     pendingVerifications: 0
   });
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     // Check authentication
     const token = localStorage.getItem('stewardToken');
@@ -39,6 +42,10 @@ export default function StewardDashboard() {
     try {
       const parsedUserData = JSON.parse(userData);
       setStewardData(parsedUserData);
+      const tabParam = searchParams.get('tab');
+      if (tabParam && ['overview','assigned','reports','profile'].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
       fetchDashboardData();
     } catch (error) {
       console.error('Error parsing user data:', error);
@@ -127,52 +134,9 @@ export default function StewardDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <div className="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg hidden lg:flex lg:flex-col">
-        <div className="flex items-center px-6 py-4 border-b border-gray-200">
-            <Image src="/mmiri-logo.png" alt="Communifi Logo" width={80} height={80} />
-          
-          {/* <h1 className="text-xl font-bold text-gray-900">COMMUNIFI</h1> */}
-        </div>
-        <nav className="flex-1 px-4 py-6 space-y-2">
-          <a href="#" className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-            <BarChart3 className="text-gray-400 mr-3 h-5 w-5" />
-            Overview
-          </a>
-          <a href="#" className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-            <FileText className="text-gray-400 mr-3 h-5 w-5" />
-            Reports
-          </a>
-          <a href="#" className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-            <Users className="text-gray-400 mr-3 h-5 w-5" />
-            Stewards
-          </a>
-          <a href="#" className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-            <User className="text-gray-400 mr-3 h-5 w-5" />
-            User Profile
-          </a>
-          <a href="#" className="text-gray-700 hover:bg-gray-50 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-            <Bell className="text-gray-400 mr-3 h-5 w-5" />
-            Notification
-          </a>
-        </nav>
-        <div className="border-t border-gray-200 p-4">
-          <div className="flex items-center mb-3">
-            <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-              <span className="text-white text-sm font-medium">{stewardData?.name?.split(' ').map(n => n[0]).join('').toUpperCase()}</span>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700">{stewardData?.name}</p>
-              <p className="text-xs text-gray-500">Steward</p>
-            </div>
-          </div>
-          <button onClick={handleLogout} className="flex items-center text-sm text-red-600 hover:text-red-800">
-            <LogOut className="w-4 h-4 mr-2" />
-            Log out
-          </button>
-        </div>
-      </div>
+      <StewardSidebar steward={stewardData} activeKey={activeTab === 'assigned' ? 'assigned' : 'dashboard'} onLogout={handleLogout} />
 
-      <div className="flex-1 lg:ml-64">
+      <div className="flex-1 lg:ml-0 overflow-hidden">
         <div className="bg-white shadow-sm border-b border-gray-200">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
@@ -301,7 +265,7 @@ export default function StewardDashboard() {
                     {assignedReports.map((report) => (
                       <tr key={report._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <button className="text-blue-600 font-medium hover:underline" onClick={() => router.push('/track')}>{report.trackingNumber}</button>
+                          <button className="text-blue-600 font-medium hover:underline" onClick={() => router.push(`/steward/reports/${report._id}`)}>{report.trackingNumber}</button>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-gray-900 text-sm">{report.issueType}</span>
@@ -321,8 +285,8 @@ export default function StewardDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
-                            <button onClick={() => router.push('/report')} className="inline-flex items-center px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-xl">Update</button>
-                            <button onClick={() => router.push('/track')} className="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-800 rounded-xl hover:bg-gray-50">View</button>
+                            <button onClick={() => router.push(`/steward/update?id=${report._id}`)} className="inline-flex items-center px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-xl">Update</button>
+                            <button onClick={() => router.push(`/steward/reports/${report._id}`)} className="inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-gray-800 rounded-xl hover:bg-gray-50">View</button>
                           </div>
                         </td>
                       </tr>

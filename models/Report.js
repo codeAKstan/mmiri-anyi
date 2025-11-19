@@ -79,7 +79,11 @@ const reportSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     },
-    createdBy: String
+    createdBy: String,
+    imageUrl: {
+      type: String,
+      default: null
+    }
   }],
   createdAt: {
     type: Date,
