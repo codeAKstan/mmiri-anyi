@@ -60,11 +60,10 @@ export default function StewardReportView() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <StewardSidebar steward={steward} activeKey="assigned" onLogout={() => { localStorage.removeItem('stewardToken'); localStorage.removeItem('stewardData'); router.push('/steward/login') }} />
-      <div className="flex-1 lg:ml-64">
+      <div className="flex-1 lg:ml-0 overflow-hidden">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center">
-            <Image src="/mmiri-logo.png" alt="Communifi Logo" width={32} height={32} />
             <span className="ml-3 font-semibold">Update Issue Status</span>
           </div>
           <button onClick={() => router.push('/steward/dashboard')} className="text-sm text-blue-600">Back to Dashboard</button>
