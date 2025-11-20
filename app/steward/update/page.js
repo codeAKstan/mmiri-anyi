@@ -1,14 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import StewardSidebar from '../../../components/StewardSidebar'
 
 export default function StewardUpdatePage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const preselectId = searchParams.get('id')
+  const preselectId = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('id') : null
   const [token, setToken] = useState('')
   const [steward, setSteward] = useState(null)
   const [assignedReports, setAssignedReports] = useState([])
@@ -80,6 +79,7 @@ export default function StewardUpdatePage() {
   }
 
   return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
     <div className="min-h-screen bg-gray-50 flex">
       <StewardSidebar steward={steward} activeKey="update" onLogout={() => { localStorage.removeItem('stewardToken'); localStorage.removeItem('stewardData'); router.push('/steward/login') }} />
       <div className="flex-1 lg:ml-0 overflow-hidden">
@@ -164,5 +164,6 @@ export default function StewardUpdatePage() {
       </main>
       </div>
     </div>
+    </Suspense>
   )
 }

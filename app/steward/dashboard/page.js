@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BarChart3, FileText, Users, User, Bell, Search, Info, CheckCircle, Clock, ClipboardCheck, LogOut } from 'lucide-react';
 import StewardSidebar from '../../../components/StewardSidebar';
@@ -27,7 +27,7 @@ export default function StewardDashboard() {
     pendingVerifications: 0
   });
 
-  const searchParams = useSearchParams();
+  const searchParams = null;
 
   useEffect(() => {
     // Check authentication
@@ -42,7 +42,8 @@ export default function StewardDashboard() {
     try {
       const parsedUserData = JSON.parse(userData);
       setStewardData(parsedUserData);
-      const tabParam = searchParams.get('tab');
+      const usp = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const tabParam = usp ? usp.get('tab') : null;
       if (tabParam && ['overview','assigned','reports','profile'].includes(tabParam)) {
         setActiveTab(tabParam);
       }
@@ -51,7 +52,7 @@ export default function StewardDashboard() {
       console.error('Error parsing user data:', error);
       router.push('/steward/login');
     }
-  }, [router, searchParams]);
+  }, [router]);
 
   const fetchDashboardData = async () => {
     try {
@@ -133,6 +134,7 @@ export default function StewardDashboard() {
   }
 
   return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
     <div className="min-h-screen bg-gray-50 flex">
       <StewardSidebar steward={stewardData} activeKey={activeTab === 'assigned' ? 'assigned' : 'dashboard'} onLogout={handleLogout} />
 
@@ -358,5 +360,6 @@ export default function StewardDashboard() {
         </main>
       </div>
     </div>
+    </Suspense>
   );
 }
