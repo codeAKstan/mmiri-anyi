@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import AIReportAssistant from "../../components/AIReportAssistant";
 
 export default function ReportIssue() {
   const [formData, setFormData] = useState({
@@ -61,6 +62,30 @@ export default function ReportIssue() {
       }
     } catch (error) {
       console.error('Error submitting report:', error);
+      alert('Failed to submit report. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const submitWithData = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const submitData = new FormData();
+      Object.keys(data).forEach((key) => {
+        if (data[key] !== null && data[key] !== "") {
+          submitData.append(key, data[key]);
+        }
+      });
+      const response = await fetch('/api/reports', { method: 'POST', body: submitData });
+      const result = await response.json();
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setTrackingNumber(result.trackingNumber);
+      } else {
+        throw new Error(result.error || 'Failed to submit report');
+      }
+    } catch (error) {
       alert('Failed to submit report. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -446,6 +471,10 @@ export default function ReportIssue() {
       </div>
       
       <Footer />
+      <AIReportAssistant
+        onApply={(d) => setFormData((prev) => ({ ...prev, ...d }))}
+        onAutoSubmit={(d) => submitWithData(d)}
+      />
     </div>
   );
 }
