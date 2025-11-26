@@ -9,12 +9,11 @@ export async function POST(request) {
     if (!apiKey) {
       return NextResponse.json({ success: false, error: 'AI not configured' }, { status: 400 })
     }
+    const mode = body?.mode || 'extract'
 
-    const system = {
-      role: 'system',
-      content:
-        'Extract a structured report as JSON with keys: category (one of water, roads, lighting, waste), issueType, location, ward, landmark, description, severity (low, medium, high), reporterName, phoneNumber, email. Infer missing values from context, default category=water. Respond with JSON only.'
-    }
+    const system = mode === 'qa'
+      ? { role: 'system', content: 'You are Communifi assistant. Briefly answer questions about the platform: reporting local civic issues (water, roads, lighting, waste), tracking via email and tracking number, stewards resolve issues, admins assign. If the question is unclear, ask the user to clarify. Keep answers concise.' }
+      : { role: 'system', content: 'Extract a structured report as JSON with keys: category (one of water, roads, lighting, waste), issueType, location, ward, landmark, description, severity (low, medium, high), reporterName, phoneNumber, email. Infer missing values from context, default category=water. Respond with JSON only.' }
 
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -24,9 +23,9 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        temperature: 0,
+        temperature: mode === 'qa' ? 0.2 : 0,
         messages: [system, ...messages],
-        response_format: { type: 'json_object' }
+        ...(mode === 'extract' ? { response_format: { type: 'json_object' } } : {})
       })
     })
 
@@ -58,10 +57,12 @@ export async function POST(request) {
     }
 
     const data = await resp.json()
-    const content = data?.choices?.[0]?.message?.content || '{}'
+    const content = data?.choices?.[0]?.message?.content || (mode === 'qa' ? '' : '{}')
+    if (mode === 'qa') {
+      return NextResponse.json({ success: true, data: { answer: content } })
+    }
     let parsed
     try { parsed = JSON.parse(content) } catch { parsed = {} }
-
     return NextResponse.json({ success: true, data: parsed })
   } catch (e) {
     return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 })

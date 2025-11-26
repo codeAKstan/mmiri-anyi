@@ -8,6 +8,85 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [extracted, setExtracted] = useState(null);
+  const [guided, setGuided] = useState(false);
+  const requiredOrder = [
+    'issueType',
+    'location',
+    'description',
+    'severity',
+    'reporterName',
+    'phoneNumber',
+    'email'
+  ];
+  const [buffer, setBuffer] = useState({});
+  const [currentKey, setCurrentKey] = useState(null);
+
+  const askFor = (key) => {
+    const prompts = {
+      issueType: 'What is the type of issue? (e.g., pipe-burst, leakage, pothole, streetlight-out)',
+      location: 'Where is the issue located? (street address, area)',
+      description: 'Briefly describe the issue and when it started',
+      severity: 'How severe is it? Choose: low, medium, or high',
+      reporterName: 'What is your name?',
+      phoneNumber: 'What is your phone number?',
+      email: 'What is your email address?'
+    };
+    setMessages((prev) => [...prev, { role: 'assistant', content: prompts[key] }]);
+    setCurrentKey(key);
+  };
+
+  const startGuided = () => {
+    setGuided(true);
+    const initial = extracted || {};
+    setBuffer(initial);
+    const missing = requiredOrder.find((k) => !initial[k] || String(initial[k]).trim() === '');
+    if (missing) {
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Okay, let’s fill your report step by step.' }]);
+      askFor(missing);
+    } else {
+      // All present; submit immediately
+      guidedSubmit(initial);
+    }
+  };
+
+  const guidedSubmit = async (data) => {
+    const mapped = mapData(data);
+    if (onAutoSubmit) {
+      onAutoSubmit(mapped);
+      return;
+    }
+    try {
+      const fd = new FormData();
+      Object.keys(mapped).forEach((k) => {
+        if (mapped[k] !== null && mapped[k] !== '') fd.append(k, mapped[k]);
+      });
+      const res = await fetch('/api/reports', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (res.ok) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: `Submitted successfully. Tracking Number: ${json.trackingNumber}` }]);
+        setGuided(false);
+      } else {
+        setMessages((prev) => [...prev, { role: 'assistant', content: `Submission failed: ${json.error || 'Please ensure all fields are provided.'}` }]);
+      }
+    } catch {
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Network error during submission.' }]);
+    }
+  };
+
+  const mapData = (data) => ({
+    category: (data.category || 'water').toLowerCase(),
+    issueType: data.issueType || '',
+    location: data.location || '',
+    ward: data.ward || '',
+    landmark: data.landmark || '',
+    description: data.description || '',
+    severity: (data.severity || '').toLowerCase(),
+    reporterName: data.reporterName || '',
+    phoneNumber: data.phoneNumber || '',
+    email: data.email || '',
+    anonymous: false,
+    image: null,
+  });
 
   const send = async () => {
     const text = input.trim();
@@ -15,23 +94,44 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
     const next = [...messages, { role: "user", content: text }];
     setMessages(next);
     setInput("");
+    if (guided && currentKey) {
+      // Record answer for current field
+      const val = text;
+      const updated = { ...buffer, [currentKey]: val };
+      setBuffer(updated);
+      // Determine next missing
+      const nextMissing = requiredOrder.find((k) => !updated[k] || String(updated[k]).trim() === '');
+      if (nextMissing) {
+        askFor(nextMissing);
+      } else {
+        setMessages((prev) => [...prev, { role: 'assistant', content: 'Great, I have all details. Submitting now.' }]);
+        await guidedSubmit(updated);
+      }
+      return;
+    }
+
+    // Normal chat
     setLoading(true);
     try {
+      const isQuestion = /\b(what|how|why|about|explain|project|communifi)\b/i.test(text) || text.endsWith('?');
       const res = await fetch("/api/ai/assist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ mode: isQuestion ? 'qa' : 'extract', messages: next }),
       });
       const data = await res.json();
-      if (data.success) {
+      if (isQuestion) {
+        const answer = data.success ? (data.data?.answer || data.data || 'I could not find an answer. Can you clarify?') : 'I could not understand that. Could you clarify your question?';
+        setMessages((prev) => [...prev, { role: 'assistant', content: String(answer) }]);
+      } else if (data.success) {
         setExtracted(data.data || null);
         const summary = summarise(data.data);
-        setMessages([...next, { role: "assistant", content: summary }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: summary }]);
       } else {
-        setMessages([...next, { role: "assistant", content: "I couldn't process that. Please provide your issue details: what happened, where, severity, and your contact." }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: "I couldn't process that. Please describe the issue, location, severity, and your contact." }]);
       }
     } catch {
-      setMessages([...next, { role: "assistant", content: "Network error. Please try again." }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Network error. Please try again." }]);
     } finally {
       setLoading(false);
     }
@@ -43,22 +143,8 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
   };
 
   const applyToForm = () => {
-    if (!extracted) return;
-    const mapped = {
-      category: (extracted.category || "water").toLowerCase(),
-      issueType: extracted.issueType || "",
-      location: extracted.location || "",
-      ward: extracted.ward || "",
-      landmark: extracted.landmark || "",
-      description: extracted.description || "",
-      severity: (extracted.severity || "").toLowerCase(),
-      reporterName: extracted.reporterName || "",
-      phoneNumber: extracted.phoneNumber || "",
-      email: extracted.email || "",
-      anonymous: false,
-      image: null,
-    };
-    onApply && onApply(mapped);
+    // Start guided collection and submit at the end
+    startGuided();
   };
 
   const autoSubmit = async () => {
