@@ -114,7 +114,7 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
       </button>
       {open && (
         <div className="fixed bottom-24 right-6 z-50 w-80 bg-white border rounded-xl shadow-xl flex flex-col">
-          <div className="px-4 py-3 border-b font-semibold">Report Assistant</div>
+          <div className="px-4 py-3 text-black border-b font-semibold">Report Assistant</div>
           <div className="p-3 h-64 overflow-y-auto space-y-2">
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "text-gray-900" : "text-gray-700"}>{m.content}</div>
@@ -126,7 +126,7 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Describe your issue and contact"
-              className="w-full border rounded-md px-3 py-2"
+              className="w-full border text-black rounded-md px-3 py-2"
             />
             <div className="flex gap-2">
               <button onClick={send} className="flex-1 bg-blue-600 text-white rounded-md px-3 py-2">Send</button>

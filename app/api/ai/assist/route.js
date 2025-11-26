@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+export const runtime = 'nodejs'
 
 export async function POST(request) {
   try {
@@ -30,8 +31,30 @@ export async function POST(request) {
     })
 
     if (!resp.ok) {
-      const err = await resp.text()
-      return NextResponse.json({ success: false, error: 'AI request failed', details: err }, { status: 500 })
+      const fallbackInput = [system, ...messages].map(m => `${m.role}: ${m.content}`).join('\n')
+      const r2 = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          temperature: 0,
+          input: fallbackInput,
+          response_format: { type: 'json_object' }
+        })
+      })
+      if (!r2.ok) {
+        const last = messages.filter(m => m.role === 'user').pop()?.content || ''
+        const data = heuristicExtract(last)
+        return NextResponse.json({ success: true, data })
+      }
+      const j2 = await r2.json()
+      const c2 = j2?.output_text || j2?.choices?.[0]?.message?.content || '{}'
+      let p2
+      try { p2 = JSON.parse(c2) } catch { p2 = {} }
+      return NextResponse.json({ success: true, data: p2 })
     }
 
     const data = await resp.json()
@@ -42,5 +65,44 @@ export async function POST(request) {
     return NextResponse.json({ success: true, data: parsed })
   } catch (e) {
     return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 })
+  }
+}
+
+function heuristicExtract(text) {
+  const t = (text || '').toLowerCase()
+  const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
+  const phoneMatch = text.match(/(?:\+\d{1,3}[\s-]?)?\d{7,14}/)
+  const wardOptions = ['abakpa-nike','new-haven','independence-layout','trans-ekulu','coal-camp','ogbete','uwani','asata']
+  const ward = wardOptions.find(w => t.includes(w)) || ''
+  let category = 'water'
+  if (t.includes('pothole') || t.includes('road')) category = 'roads'
+  else if (t.includes('streetlight') || t.includes('lighting') || t.includes('lamp')) category = 'lighting'
+  else if (t.includes('waste') || t.includes('bin') || t.includes('garbage')) category = 'waste'
+  let severity = ''
+  if (t.includes('urgent') || t.includes('immediate') || t.includes('high')) severity = 'high'
+  else if (t.includes('medium')) severity = 'medium'
+  else if (t.includes('low') || t.includes('minor')) severity = 'low'
+  let location = ''
+  const locMatch = text.match(/(?:at|in|on)\s+([^.,\n]+)/i)
+  if (locMatch) location = locMatch[1].trim()
+  let issueType = ''
+  if (t.includes('pipe')) issueType = 'pipe-burst'
+  else if (t.includes('leak')) issueType = 'leakage'
+  else if (t.includes('pothole')) issueType = 'pothole'
+  else if (t.includes('streetlight')) issueType = 'streetlight-out'
+  else if (t.includes('waste')) issueType = 'waste-overflow'
+  const nameMatch = text.match(/my name is\s+([A-Za-z\s]+)/i)
+  const landmarkMatch = text.match(/near\s+([^.,\n]+)/i)
+  return {
+    category,
+    issueType,
+    location,
+    ward,
+    landmark: landmarkMatch ? landmarkMatch[1].trim() : '',
+    description: text || '',
+    severity,
+    reporterName: nameMatch ? nameMatch[1].trim() : '',
+    phoneNumber: phoneMatch ? phoneMatch[0] : '',
+    email: emailMatch ? emailMatch[0] : ''
   }
 }
