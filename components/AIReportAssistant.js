@@ -96,7 +96,17 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
     setInput("");
     if (guided && currentKey) {
       // Record answer for current field
-      const val = text;
+      let val = text;
+      if (currentKey === 'severity') {
+        const v = val.trim().toLowerCase();
+        const map = { meduim: 'medium', mid: 'medium', moderate: 'medium', normal: 'medium', hi: 'high', urgent: 'high', critical: 'high', severe: 'high', minor: 'low' };
+        const norm = ['low','medium','high'].includes(v) ? v : (map[v] || '');
+        if (!norm) {
+          setMessages((prev) => [...prev, { role: 'assistant', content: 'Please choose severity: low, medium, or high.' }]);
+          return;
+        }
+        val = norm;
+      }
       const updated = { ...buffer, [currentKey]: val };
       setBuffer(updated);
       // Determine next missing
@@ -147,48 +157,7 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
     startGuided();
   };
 
-  const autoSubmit = async () => {
-    if (!extracted) return;
-    const mapped = {
-      category: (extracted.category || "water").toLowerCase(),
-      issueType: extracted.issueType || "",
-      location: extracted.location || "",
-      ward: extracted.ward || "",
-      landmark: extracted.landmark || "",
-      description: extracted.description || "",
-      severity: (extracted.severity || "").toLowerCase(),
-      reporterName: extracted.reporterName || "",
-      phoneNumber: extracted.phoneNumber || "",
-      email: extracted.email || "",
-      anonymous: false,
-      image: null,
-    };
-    if (onAutoSubmit) {
-      onAutoSubmit(mapped);
-      return;
-    }
-    try {
-      const fd = new FormData();
-      Object.keys(mapped).forEach((k) => {
-        if (mapped[k] !== null && mapped[k] !== "") fd.append(k, mapped[k]);
-      });
-      const res = await fetch("/api/reports", { method: "POST", body: fd });
-      const json = await res.json();
-      if (res.ok) {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: `Submitted successfully. Tracking Number: ${json.trackingNumber}` },
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: `Submission failed: ${json.error || "Please provide email, location and issue details."}` },
-        ]);
-      }
-    } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Network error during submission." }]);
-    }
-  };
+  // Manual submit removed; assistant submits automatically after guided collection
 
   return (
     <>
@@ -217,7 +186,6 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
             <div className="flex gap-2">
               <button onClick={send} className="flex-1 bg-blue-600 text-white rounded-md px-3 py-2">Send</button>
               <button onClick={applyToForm} className="flex-1 bg-gray-100 text-gray-900 rounded-md px-3 py-2">Fill Form</button>
-              <button onClick={autoSubmit} className="flex-1 bg-green-600 text-white rounded-md px-3 py-2">Submit</button>
             </div>
           </div>
         </div>

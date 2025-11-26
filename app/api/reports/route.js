@@ -21,12 +21,30 @@ export async function POST(request) {
     // Parse form data
     const formData = await request.formData();
     
+    const normalizeSeverity = (s) => {
+      if (!s) return '';
+      const v = String(s).trim().toLowerCase();
+      const map = {
+        meduim: 'medium',
+        mid: 'medium',
+        moderate: 'medium',
+        normal: 'medium',
+        hi: 'high',
+        urgent: 'high',
+        critical: 'high',
+        severe: 'high',
+        minor: 'low',
+        low: 'low'
+      };
+      return ['low','medium','high'].includes(v) ? v : (map[v] || v);
+    };
+
     const reportData = {
       category: formData.get('category') || 'water',
       issueType: formData.get('issueType'),
       location: formData.get('location'),
       description: formData.get('description'),
-      severity: formData.get('severity'),
+      severity: normalizeSeverity(formData.get('severity')),
       name: formData.get('reporterName'),
       phone: formData.get('phoneNumber'),
       email: formData.get('email'),
@@ -69,6 +87,14 @@ export async function POST(request) {
           { status: 500 }
         );
       }
+    }
+
+    // Validate severity explicitly
+    if (!['low','medium','high'].includes(reportData.severity)) {
+      return NextResponse.json(
+        { error: 'severity must be one of low, medium, high' },
+        { status: 400 }
+      );
     }
 
     // Create new report
