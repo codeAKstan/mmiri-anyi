@@ -61,7 +61,7 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
     onApply && onApply(mapped);
   };
 
-  const autoSubmit = () => {
+  const autoSubmit = async () => {
     if (!extracted) return;
     const mapped = {
       category: (extracted.category || "water").toLowerCase(),
@@ -77,7 +77,31 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
       anonymous: false,
       image: null,
     };
-    onAutoSubmit && onAutoSubmit(mapped);
+    if (onAutoSubmit) {
+      onAutoSubmit(mapped);
+      return;
+    }
+    try {
+      const fd = new FormData();
+      Object.keys(mapped).forEach((k) => {
+        if (mapped[k] !== null && mapped[k] !== "") fd.append(k, mapped[k]);
+      });
+      const res = await fetch("/api/reports", { method: "POST", body: fd });
+      const json = await res.json();
+      if (res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: `Submitted successfully. Tracking Number: ${json.trackingNumber}` },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: `Submission failed: ${json.error || "Please provide email, location and issue details."}` },
+        ]);
+      }
+    } catch {
+      setMessages((prev) => [...prev, { role: "assistant", content: "Network error during submission." }]);
+    }
   };
 
   return (
