@@ -131,8 +131,19 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
       });
       const data = await res.json();
       if (isQuestion) {
-        const answer = data.success ? (data.data?.answer || data.data || 'I could not find an answer. Can you clarify?') : 'I could not understand that. Could you clarify your question?';
-        setMessages((prev) => [...prev, { role: 'assistant', content: String(answer) }]);
+        let answer;
+        if (data.success) {
+          if (data.data?.answer) {
+            answer = data.data.answer;
+          } else if (typeof data.data === 'string') {
+            answer = data.data;
+          } else {
+            answer = 'I could not find an answer. Can you clarify?';
+          }
+        } else {
+          answer = 'I could not understand that. Could you clarify your question?';
+        }
+        setMessages((prev) => [...prev, { role: 'assistant', content: answer }]);
       } else if (data.success) {
         setExtracted(data.data || null);
         const summary = summarise(data.data);

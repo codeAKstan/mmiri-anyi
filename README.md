@@ -1,16 +1,16 @@
-# Communifi
+# Mmiri-Anyi
 
-Communifi is a comprehensive water management and monitoring system built with Next.js. The application provides real-time water quality monitoring, usage tracking, and intelligent alerts to help protect and manage water resources effectively.
+Mmiri-Anyi is a community-driven civic issues reporting platform built with Next.js. The application connects citizens with local authorities, enabling people to detect, report, and resolve everyday problems in their communities including water issues, road potholes, street lighting, and waste management.
 
-## 🌊 Features
+## 🏘️ Features
 
-- **Real-time Water Quality Monitoring** - Track pH, turbidity, dissolved oxygen, and other key water quality parameters
-- **Usage Analytics** - Monitor water consumption patterns and identify optimization opportunities
-- **Smart Alerts** - Receive notifications for water quality issues, unusual usage patterns, or system anomalies
-- **Historical Data Analysis** - View trends and generate reports on water quality and usage over time
-- **Multi-location Support** - Manage multiple water sources and monitoring points
-- **Dashboard & Visualization** - Interactive charts and graphs for easy data interpretation
-- **Mobile Responsive** - Access your water data from any device
+- **Issue Reporting** - Report various civic problems including water issues, road damage, lighting problems, and waste management
+- **Community Engagement** - Connect citizens with local authorities for faster issue resolution
+- **Issue Tracking** - Monitor the status and progress of reported issues
+- **Multi-category Support** - Handle diverse civic problems from infrastructure to utilities
+- **Location-based Reporting** - GPS-enabled issue reporting for precise problem identification
+- **Dashboard & Analytics** - Track community issues and resolution patterns
+- **Mobile Responsive** - Report and track issues from any device
 
 ## 🏗️ Architecture
 
@@ -78,30 +78,31 @@ communifi/
 
 The backend API is built using Next.js API Routes and provides the following endpoints:
 
-- `GET /api/water-quality` - Retrieve water quality data
-- `POST /api/water-quality` - Submit new water quality readings
-- `GET /api/usage` - Get water usage statistics
-- `GET /api/alerts` - Fetch active alerts and notifications
-- `POST /api/alerts` - Create new alerts
-- `GET /api/locations` - List all monitoring locations
-- `POST /api/locations` - Add new monitoring location
+- `GET /api/issues` - Retrieve reported civic issues
+- `POST /api/issues` - Submit new issue reports
+- `GET /api/categories` - Get issue categories (water, roads, lighting, waste, etc.)
+- `GET /api/status` - Check issue resolution status
+- `POST /api/status` - Update issue status
+- `GET /api/locations` - List all reporting locations
+- `POST /api/locations` - Add new reporting location
 
 ## 🎨 Styling
 
 This project uses Tailwind CSS v4 for styling with a custom design system:
 
-- **Colors**: Custom color palette optimized for water-themed UI
+- **Colors**: Custom color palette optimized for civic engagement UI
 - **Typography**: Geist font family for modern, clean text
-- **Components**: Responsive design components for data visualization
+- **Components**: Responsive design components for issue reporting and tracking
 - **Dark Mode**: Built-in dark mode support
 
 ## 📊 Data Visualization
 
-Communifi includes interactive charts and graphs for:
-- Water quality trends over time
-- Usage patterns and consumption analytics
-- Alert frequency and response times
-- Multi-location comparison views
+Mmiri-Anyi includes interactive charts and graphs for:
+- Issue reporting trends over time
+- Category-wise problem analysis
+- Resolution time tracking
+- Community engagement metrics
+- Geographic distribution of issues
 
 ## 🔒 Security
 
@@ -114,7 +115,7 @@ Communifi includes interactive charts and graphs for:
 
 ### Vercel (Recommended)
 
-The easiest way to deploy Communifi is using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme):
+The easiest way to deploy Mmiri-Anyi is using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme):
 
 1. Push your code to GitHub
 2. Connect your repository to Vercel
@@ -123,7 +124,7 @@ The easiest way to deploy Communifi is using the [Vercel Platform](https://verce
 
 ### Other Platforms
 
-Communifi can be deployed on any platform that supports Next.js:
+Mmiri-Anyi can be deployed on any platform that supports Next.js:
 - Netlify
 - AWS Amplify
 - Railway
@@ -155,4 +156,5 @@ For support and questions:
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [React Documentation](https://react.dev)
-- [Water Quality Standards](https://www.epa.gov/ground-water-and-drinking-water)
+- [Civic Engagement Best Practices](https://www.govtech.com)
+- [Community Reporting Guidelines](https://www.icma.org)
