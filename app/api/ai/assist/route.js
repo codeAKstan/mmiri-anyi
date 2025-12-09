@@ -12,7 +12,7 @@ export async function POST(request) {
     const mode = body?.mode || 'extract'
 
     const system = mode === 'qa'
-      ? { role: 'system', content: 'You are Mmiri-Anyi assistant. Briefly answer questions about the platform: Mmiri-Anyi is a community-driven civic issues reporting platform that connects citizens with local authorities to report and resolve everyday problems like water issues, road potholes, street lighting, and waste management. Citizens can report issues, track them via email and tracking number, stewards resolve issues, and admins assign them. If the question is unclear, ask the user to clarify. Keep answers concise.' }
+      ? { role: 'system', content: 'You are a helpful assistant. Answer any user question concisely and clearly. If the question is vague or missing context, ask the user to clarify. Keep responses brief and useful.' }
       : { role: 'system', content: 'Extract a structured report as JSON with keys: category (one of water, roads, lighting, waste), issueType, location, ward, landmark, description, severity (low, medium, high), reporterName, phoneNumber, email. Infer missing values from context, default category=water. Respond with JSON only.' }
 
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -31,19 +31,23 @@ export async function POST(request) {
 
     if (!resp.ok) {
       if (mode === 'qa') {
-        // Provide fallback answer for Q&A mode
-        const userQuestion = messages.filter(m => m.role === 'user').pop()?.content?.toLowerCase() || ''
-        let fallbackAnswer = 'I could not process your question. Please try again.'
-        
-        if (userQuestion.includes('project') || userQuestion.includes('about') || userQuestion.includes('mmiri') || userQuestion.includes('communifi')) {
-          fallbackAnswer = 'Mmiri-Anyi is a community-driven civic issues reporting platform that connects citizens with local authorities to report and resolve everyday problems like water issues, road potholes, street lighting, and waste management. Citizens can report issues, track them via email and tracking number, while stewards and admins help resolve the issues.'
-        } else if (userQuestion.includes('how') && userQuestion.includes('work')) {
-          fallbackAnswer = 'Citizens report civic issues through our platform, get a tracking number via email, stewards are assigned to resolve the issues, and you can track progress throughout the resolution process.'
-        } else if (userQuestion.includes('report')) {
-          fallbackAnswer = 'You can report civic issues like water problems, road potholes, street lighting, and waste management through our platform. Just describe the issue, location, and your contact details.'
-        }
-        
-        return NextResponse.json({ success: true, data: { answer: fallbackAnswer } })
+        const joined = [system, ...messages].map(m => `${m.role}: ${m.content}`).join('\n')
+        try {
+          const r2 = await fetch('https://api.openai.com/v1/responses', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.2, input: joined })
+          })
+          if (r2.ok) {
+            const j2 = await r2.json()
+            const a2 = j2?.output_text || j2?.choices?.[0]?.message?.content || ''
+            return NextResponse.json({ success: true, data: { answer: a2 } })
+          }
+        } catch {}
+        return NextResponse.json({ success: true, data: { answer: 'I could not process that question right now. Could you clarify or try again?' } })
       } else {
         // Fallback for extraction mode
         const last = messages.filter(m => m.role === 'user').pop()?.content || ''

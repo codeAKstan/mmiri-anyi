@@ -123,7 +123,7 @@ export default function AIReportAssistant({ onApply, onAutoSubmit }) {
     // Normal chat
     setLoading(true);
     try {
-      const isQuestion = /\b(what|how|why|about|explain|project|communifi)\b/i.test(text) || text.endsWith('?');
+      const isQuestion = /\b(what|how|why|who|where|when|which|can|could|about|explain|project|communifi)\b/i.test(text) || /\?$/.test(text);
       const res = await fetch("/api/ai/assist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
