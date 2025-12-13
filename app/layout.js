@@ -23,8 +23,24 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <AIReportAssistant />
+        {process.env.MAINTENANCE_MODE === 'true' ? (
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="max-w-md w-full bg-white border rounded-2xl shadow-sm p-8 text-center">
+              <h1 className="text-2xl font-bold text-gray-900">We’ll be back soon</h1>
+              <p className="text-gray-600 mt-3">
+                {process.env.MAINTENANCE_MODE_MESSAGE || 'The system is currently undergoing maintenance. Please check back shortly.'}
+              </p>
+              <div className="mt-6 text-sm text-gray-500">
+                <p>Thank you for your patience.</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {children}
+            <AIReportAssistant />
+          </>
+        )}
       </body>
     </html>
   );
