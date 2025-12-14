@@ -88,7 +88,7 @@ export default function Footer() {
         </div>
         <div className="border-t border-[#13183F] pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex space-x-6 text-sm">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+            {/* <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a> */}
             <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of service</a>
             <a href="#" className="text-gray-400 hover:text-white transition-colors">Emergency Protocol</a>
           </div>
